@@ -150,6 +150,7 @@ export default function App() {
   const [editLyricsId, setEditLyricsId]     = useState(null)
   const [editLyricsTitle, setEditLyricsTitle] = useState('')
   const [activePanel, setActivePanel]       = useState(1)
+  const [viewMode, setViewMode]             = useState(() => window.innerWidth < 768 ? 'mobile' : 'desktop')
 
   // ── localStorage 헬퍼 ─────────────────────────────────────
   const persistHistory = (entries) => {
@@ -442,31 +443,40 @@ export default function App() {
 
       {/* ── Header ── */}
       <header
-        className="shrink-0 flex items-center justify-center py-3"
+        className="shrink-0 flex items-center px-4 py-3"
         style={{ borderBottom: '1px solid #2d2d3e' }}
       >
+        <div className="flex-1" />
         <div className="flex flex-col items-center gap-0.5">
-          <span style={{
-            fontSize: '2rem',
-            fontWeight: 700,
-            letterSpacing: '0.3em',
-            color: '#1DB954',
-            lineHeight: 1,
-          }}>CPP</span>
-          <span style={{
-            fontSize: '0.6rem',
-            letterSpacing: '0.25em',
-            color: '#a78bfa',
-            fontWeight: 400,
-          }}>COPYPRACTICE PLAYER</span>
+          <span style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '0.3em', color: '#1DB954', lineHeight: 1 }}>CPP</span>
+          <span style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: '#a78bfa', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
+        </div>
+        <div className="flex-1 flex justify-end items-center gap-2">
+          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? '#1DB954' : '#a78bfa', transition: 'color 0.2s' }}>PC</span>
+          <button
+            onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')}
+            style={{
+              width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              background: viewMode === 'mobile' ? '#1DB954' : '#2d2d3e',
+              position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+            }}
+          >
+            <div style={{
+              position: 'absolute', top: '2px',
+              left: viewMode === 'mobile' ? '22px' : '2px',
+              width: '20px', height: '20px', borderRadius: '50%',
+              background: '#ffffff', transition: 'left 0.2s',
+            }} />
+          </button>
+          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? '#1DB954' : '#a78bfa', transition: 'color 0.2s' }}>모바일</span>
         </div>
       </header>
 
       {/* ── Body ── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className={`flex flex-1 overflow-hidden ${viewMode === 'mobile' ? 'flex-col' : 'flex-row'}`}>
 
         {/* ══ LEFT — Player ══ */}
-        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div className={`min-w-0 flex flex-col overflow-hidden ${viewMode === 'mobile' ? 'w-full shrink-0' : 'flex-1'}`}>
 
           {/* URL / File 입력 */}
           <div
@@ -546,7 +556,7 @@ export default function App() {
           </div>
 
           {/* 영상 플레이어 */}
-          <div className="flex-[4] min-h-0 bg-black relative">
+          <div className={`bg-black relative ${viewMode === 'mobile' ? 'aspect-video' : 'flex-[4] min-h-0'}`}>
             {url ? (
               <>
                 <ReactPlayer
@@ -570,7 +580,7 @@ export default function App() {
 
           {/* 컨트롤 패널 */}
           <div
-            className="flex-[1] min-h-0 px-4 py-3 flex flex-col justify-between overflow-hidden"
+            className={`px-4 py-3 flex flex-col overflow-y-auto ${viewMode === 'mobile' ? 'shrink-0 gap-3' : 'flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}`}
             style={{ background: '#16161d', borderTop: '1px solid #2d2d3e' }}
           >
             {/* 시크바 */}
@@ -594,7 +604,7 @@ export default function App() {
             </div>
 
             {/* 재생 · 속도 · 스킵 · 볼륨 */}
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className={`flex items-center flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-2 pb-0.5' : 'gap-3 flex-wrap'}`}>
               <button
                 onClick={() => setPlaying(p => !p)} disabled={!url}
                 aria-label={playing ? '일시정지' : '재생'}
@@ -620,11 +630,11 @@ export default function App() {
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="text-xs" style={{ color: '#a78bfa' }}>스킵</span>
                 <button onClick={() => skip(-skipSeconds)} disabled={!url}
-                  className="px-2.5 py-1 rounded text-sm transition-colors disabled:opacity-30"
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
                   style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}
                 >◀◀</button>
                 <button onClick={() => skip(skipSeconds)} disabled={!url}
-                  className="px-2.5 py-1 rounded text-sm transition-colors disabled:opacity-30"
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
                   style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}
                 >▶▶</button>
                 <div className="flex gap-1 ml-1">
@@ -648,13 +658,18 @@ export default function App() {
             {/* A-B 반복 */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-medium shrink-0" style={{ color: '#a78bfa' }}>🔂 구간 반복</span>
-              <button onClick={handleSetA} disabled={!url} style={{ ...abBtn(pointA !== null), opacity: !url ? 0.3 : 1 }}>
+              <button onClick={handleSetA} disabled={!url}
+                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                style={{ ...abBtn(pointA !== null), opacity: !url ? 0.3 : 1 }}>
                 ⬇ A {pointA !== null ? formatTime(pointA) : '시작'}
               </button>
-              <button onClick={handleSetB} disabled={!url} style={{ ...abBtn(pointB !== null), opacity: !url ? 0.3 : 1 }}>
+              <button onClick={handleSetB} disabled={!url}
+                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                style={{ ...abBtn(pointB !== null), opacity: !url ? 0.3 : 1 }}>
                 ⬆ B {pointB !== null ? formatTime(pointB) : '끝'}
               </button>
               <button onClick={handleToggleLoop} disabled={!canLoop}
+                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
                 style={{
                   padding: '4px 12px',
                   borderRadius: '6px',
@@ -670,6 +685,7 @@ export default function App() {
                 }}
               >{looping ? '🔁 반복 중' : '↩ 반복'}</button>
               <button onClick={handleClearAB} disabled={pointA === null && pointB === null}
+                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
                 style={{
                   padding: '4px 10px',
                   borderRadius: '6px',
@@ -686,10 +702,7 @@ export default function App() {
         </div>
 
         {/* ══ RIGHT — 가사 패널 ══ */}
-        <div
-          className="flex-1 min-w-0 flex flex-col"
-          style={{ borderLeft: '1px solid #2d2d3e' }}
-        >
+        <div className={`flex-1 min-w-0 flex flex-col ${viewMode === 'mobile' ? 'border-t' : 'border-l'} border-[#2d2d3e]`}>
           {/* 가사 툴바 */}
           <div
             className="shrink-0 px-4 py-2.5 flex items-center gap-3 flex-wrap"
