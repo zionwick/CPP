@@ -132,7 +132,7 @@ export default function App() {
 
   // ── 영상 기록 ──────────────────────────────────────────────
   const [history, setHistory]             = useState(() => readStorage(HISTORY_KEY))
-  const [showHistory, setShowHistory]     = useState(true)
+  const [showHistory, setShowHistory]     = useState(() => window.innerWidth >= 768)
   const [activeVideoId, setActiveVideoId] = useState(null)
   const [editVideoId, setEditVideoId]     = useState(null)
   const [editVideoTitle, setEditVideoTitle] = useState('')
@@ -480,43 +480,52 @@ export default function App() {
       </header>
 
       {/* ── Body ── */}
-      <div className={`flex flex-1 overflow-hidden ${viewMode === 'mobile' ? 'flex-col' : 'flex-row'}`}>
+      <div className={viewMode === 'mobile'
+        ? 'flex-1 flex flex-col overflow-y-auto overscroll-contain'
+        : 'flex flex-1 overflow-hidden flex-row'}
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
 
         {/* ══ LEFT — Player ══ */}
-        <div className={`min-w-0 flex flex-col overflow-hidden ${viewMode === 'mobile' ? 'w-full shrink-0' : 'flex-1'}`}>
+        <div
+          className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'w-full sticky top-0 z-10 shrink-0' : 'flex-1 overflow-hidden'}`}
+          style={viewMode === 'mobile' ? { background: '#0f0f13' } : undefined}
+        >
 
           {/* URL / File 입력 */}
           <div
-            className="shrink-0 flex gap-2 items-center px-4 py-2.5 flex-wrap"
+            className={`shrink-0 flex gap-1.5 items-center flex-nowrap ${viewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2.5 flex-wrap'}`}
             style={{ borderBottom: '1px solid #2d2d3e' }}
           >
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors"
+              className={`flex items-center gap-1 rounded-lg transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
               style={{ background: '#1e1e28', color: '#a78bfa', border: '1px solid #2d2d3e' }}
               onMouseEnter={e => e.currentTarget.style.color='#ffffff'}
               onMouseLeave={e => e.currentTarget.style.color='#a78bfa'}
-            >📂 <span>로컬 파일</span></button>
+            >
+              📂{viewMode !== 'mobile' && <span>로컬 파일</span>}
+            </button>
             <input ref={fileInputRef} type="file" accept="video/*,audio/*" className="hidden" onChange={handleFileChange} />
             {fileName && (
-              <span className="text-xs truncate max-w-32" style={{ color: '#a78bfa' }} title={fileName}>{fileName}</span>
+              <span className="text-xs truncate max-w-24 shrink-0" style={{ color: '#a78bfa' }} title={fileName}>{fileName}</span>
             )}
-            <form onSubmit={handleYouTubeSubmit} className="flex gap-2 flex-1 min-w-52">
+            <form onSubmit={handleYouTubeSubmit} className="flex gap-1.5 flex-1 min-w-0">
               <input
                 type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
-                placeholder="YouTube URL 붙여넣기..."
-                className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none transition-colors"
+                placeholder={viewMode === 'mobile' ? 'YouTube URL...' : 'YouTube URL 붙여넣기...'}
+                className={`flex-1 min-w-0 rounded-lg focus:outline-none transition-colors ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
                 style={{ background: '#1e1e28', border: '1px solid #2d2d3e', color: '#ffffff' }}
                 onFocus={e => e.target.style.borderColor='#1DB954'}
                 onBlur={e => e.target.style.borderColor='#2d2d3e'}
               />
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className={`flex items-center gap-1 rounded-lg font-medium transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm gap-1.5'}`}
                 style={{ background: '#1DB954', color: '#000000' }}
                 onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
                 onMouseLeave={e => e.currentTarget.style.opacity='1'}
-              >▶ 재생</button>
+              >▶{viewMode !== 'mobile' && ' 재생'}</button>
             </form>
           </div>
 
@@ -709,7 +718,7 @@ export default function App() {
         </div>
 
         {/* ══ RIGHT — 가사 패널 ══ */}
-        <div className={`flex-1 min-w-0 flex flex-col ${viewMode === 'mobile' ? 'border-t' : 'border-l'} border-[#2d2d3e]`}>
+        <div className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'border-t' : 'flex-1 border-l'} border-[#2d2d3e]`}>
           {/* 가사 툴바 */}
           <div
             className="shrink-0 px-4 py-2.5 flex items-center gap-3 flex-wrap"
@@ -900,7 +909,7 @@ export default function App() {
           </div>
 
           {/* 가사 편집 영역 */}
-          <div className="flex-1 flex overflow-hidden">
+          <div className={viewMode === 'mobile' ? 'flex' : 'flex-1 flex overflow-hidden'}>
             {/* A 패널 */}
             <div
               ref={lyricsRef}
@@ -913,8 +922,9 @@ export default function App() {
                 background: activePanel === 1 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
                 borderRight: lyricsView === 'AB' ? `1px solid ${activePanel === 1 ? 'rgba(29,185,84,0.2)' : '#2d2d3e'}` : 'none',
                 transition: 'background 0.2s, border-color 0.2s',
+                minHeight: viewMode === 'mobile' ? '60vh' : undefined,
               }}
-              className="flex-1 p-5 text-white leading-relaxed focus:outline-none overflow-y-auto"
+              className={`flex-1 p-5 text-white leading-relaxed focus:outline-none ${viewMode === 'mobile' ? '' : 'overflow-y-auto'}`}
             />
             {/* B 패널 */}
             <div
@@ -927,8 +937,9 @@ export default function App() {
                 fontSize: `${fontSize}px`,
                 background: activePanel === 2 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
                 transition: 'background 0.2s',
+                minHeight: viewMode === 'mobile' ? '60vh' : undefined,
               }}
-              className="flex-1 p-5 text-white leading-relaxed focus:outline-none overflow-y-auto"
+              className={`flex-1 p-5 text-white leading-relaxed focus:outline-none ${viewMode === 'mobile' ? '' : 'overflow-y-auto'}`}
             />
           </div>
         </div>
