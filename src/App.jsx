@@ -151,6 +151,13 @@ export default function App() {
   const [editLyricsTitle, setEditLyricsTitle] = useState('')
   const [activePanel, setActivePanel]       = useState(1)
   const [viewMode, setViewMode]             = useState(() => window.innerWidth < 768 ? 'mobile' : 'desktop')
+  const [lyricsView, setLyricsView]         = useState(() => window.innerWidth < 768 ? 'A' : 'AB')
+
+  const switchLyricsView = (v) => {
+    setLyricsView(v)
+    if (v === 'A') setActivePanel(1)
+    if (v === 'B') setActivePanel(2)
+  }
 
   // ── localStorage 헬퍼 ─────────────────────────────────────
   const persistHistory = (entries) => {
@@ -777,22 +784,36 @@ export default function App() {
               }}
             >💾 저장</button>
 
-            {/* 패널 표시 + 지우기 */}
-            <div className="ml-auto flex items-center gap-3">
-              <span className="text-xs" style={{ color: '#a78bfa' }}>
-                패널{' '}
-                <span style={{ color: activePanel === 1 ? '#1DB954' : '#a78bfa', fontWeight: 700 }}>A</span>
-                {' '}/{' '}
-                <span style={{ color: activePanel === 2 ? '#1DB954' : '#a78bfa', fontWeight: 700 }}>B</span>
-              </span>
+            {/* 패널 뷰 전환 + 지우기 */}
+            <div className="ml-auto flex items-center gap-2">
+              {[
+                { key: 'A',  label: 'A' },
+                { key: 'AB', label: 'A│B' },
+                { key: 'B',  label: 'B' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => switchLyricsView(key)}
+                  className="min-h-[44px] md:min-h-[28px]"
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    background: lyricsView === key ? 'rgba(29,185,84,0.18)' : '#1e1e28',
+                    color: lyricsView === key ? '#1DB954' : '#a78bfa',
+                    boxShadow: lyricsView === key ? 'inset 0 0 0 1px #1DB954' : 'none',
+                  }}
+                >{label}</button>
+              ))}
+              <div style={{ width: '1px', height: '16px', background: '#2d2d3e', flexShrink: 0 }} />
               <button onClick={clearLyrics}
                 style={{
-                  fontSize: '11px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#a78bfa',
-                  transition: 'color 0.15s',
+                  fontSize: '11px', background: 'none', border: 'none',
+                  cursor: 'pointer', color: '#a78bfa', transition: 'color 0.15s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.color='#ffffff'}
                 onMouseLeave={e => e.currentTarget.style.color='#a78bfa'}
@@ -878,27 +899,31 @@ export default function App() {
             )}
           </div>
 
-          {/* 가사 편집 영역 — A / B 5:5 */}
+          {/* 가사 편집 영역 */}
           <div className="flex-1 flex overflow-hidden">
+            {/* A 패널 */}
             <div
               ref={lyricsRef}
               contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(1)}
               data-placeholder={'A 패널\n\n가사를 붙여넣거나 직접 입력하세요.\n선택 후 형광펜으로 강조할 수 있습니다.'}
               style={{
+                display: lyricsView === 'B' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,
                 background: activePanel === 1 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
-                borderRight: `1px solid ${activePanel === 1 ? 'rgba(29,185,84,0.2)' : '#2d2d3e'}`,
+                borderRight: lyricsView === 'AB' ? `1px solid ${activePanel === 1 ? 'rgba(29,185,84,0.2)' : '#2d2d3e'}` : 'none',
                 transition: 'background 0.2s, border-color 0.2s',
               }}
               className="flex-1 p-5 text-white leading-relaxed focus:outline-none overflow-y-auto"
             />
+            {/* B 패널 */}
             <div
               ref={lyricsRef2}
               contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(2)}
               data-placeholder={'B 패널\n\n가사를 붙여넣거나 직접 입력하세요.\n선택 후 형광펜으로 강조할 수 있습니다.'}
               style={{
+                display: lyricsView === 'A' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,
                 background: activePanel === 2 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
                 transition: 'background 0.2s',
