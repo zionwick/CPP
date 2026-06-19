@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cpp-5ud.pages.dev/sitemap.xml
