@@ -1,0 +1,6 @@
+/sitemap.xml
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: noarchive
+
+/robots.txt
+  Access-Control-Allow-Origin: *
