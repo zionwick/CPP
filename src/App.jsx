@@ -105,6 +105,109 @@ function HistoryRow({
   )
 }
 
+const HELP_STEPS = [
+  { icon: '🎵', text: '유튜브 URL 붙여넣기 또는 로컬 파일 선택' },
+  { icon: '▶️', text: '재생 후 연습할 구간 찾기' },
+  { icon: '🅐', text: 'A 버튼으로 반복 시작점 지정' },
+  { icon: '🅑', text: 'B 버튼으로 반복 끝점 지정 → 자동 반복 시작' },
+  { icon: '🐢', text: '속도 버튼으로 느리게 조절 (0.25x ~ 1.0x)' },
+  { icon: '📝', text: '가사 패널에 가사 입력 후 형광펜으로 표시' },
+]
+
+function HelpModal({ onClose }) {
+  const [dontShow, setDontShow] = useState(false)
+
+  const handleClose = () => {
+    if (dontShow) localStorage.setItem('cp-help-seen', '1')
+    onClose()
+  }
+
+  return (
+    <div
+      onClick={handleClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 99999,
+        background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '16px',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#1a1a2e',
+          borderRadius: '16px',
+          padding: '28px 32px 24px',
+          width: '100%',
+          maxWidth: '480px',
+          border: '1px solid rgba(29,185,84,0.25)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+        }}
+      >
+        {/* 제목 */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+          <div>
+            <div style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#1DB954', marginBottom: '4px', fontWeight: 600 }}>GUIDE</div>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>CopyPractice Player 사용법</h2>
+          </div>
+          <button
+            onClick={handleClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a78bfa', fontSize: '20px', lineHeight: 1, padding: '2px 4px' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
+            onMouseLeave={e => e.currentTarget.style.color = '#a78bfa'}
+          >✕</button>
+        </div>
+
+        {/* 단계 목록 */}
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {HELP_STEPS.map(({ icon, text }, i) => (
+            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <span style={{
+                minWidth: '28px', height: '28px', borderRadius: '50%',
+                background: 'rgba(29,185,84,0.12)',
+                border: '1px solid rgba(29,185,84,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '11px', fontWeight: 700, color: '#1DB954', flexShrink: 0,
+              }}>{i + 1}</span>
+              <div style={{ paddingTop: '4px' }}>
+                <span style={{ marginRight: '6px' }}>{icon}</span>
+                <span style={{ fontSize: '14px', color: '#e2e2e2', lineHeight: 1.5 }}>{text}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {/* 구분선 */}
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '20px 0' }} />
+
+        {/* 하단 */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={dontShow}
+              onChange={e => setDontShow(e.target.checked)}
+              style={{ accentColor: '#1DB954', width: '14px', height: '14px', cursor: 'pointer' }}
+            />
+            <span style={{ fontSize: '12px', color: '#a78bfa' }}>다시 보지 않기</span>
+          </label>
+          <button
+            onClick={handleClose}
+            style={{
+              padding: '8px 24px', borderRadius: '8px', border: 'none',
+              background: '#1DB954', color: '#000000',
+              fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >확인</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const playerRef    = useRef(null)
   const fileInputRef = useRef(null)
@@ -152,6 +255,7 @@ export default function App() {
   const [activePanel, setActivePanel]       = useState(1)
   const [viewMode, setViewMode]             = useState(() => window.innerWidth < 768 ? 'mobile' : 'desktop')
   const [lyricsView, setLyricsView]         = useState(() => window.innerWidth < 768 ? 'A' : 'AB')
+  const [showHelp, setShowHelp]             = useState(() => !localStorage.getItem('cp-help-seen'))
 
   const switchLyricsView = (v) => {
     setLyricsView(v)
@@ -458,7 +562,20 @@ export default function App() {
           <span style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '0.3em', color: '#1DB954', lineHeight: 1 }}>CPP</span>
           <span style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: '#a78bfa', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
         </div>
-        <div className="flex-1 flex justify-end items-center gap-2">
+        <div className="flex-1 flex justify-end items-center gap-3">
+          <button
+            onClick={() => setShowHelp(true)}
+            title="사용법 보기"
+            style={{
+              width: '28px', height: '28px', borderRadius: '50%',
+              border: '1px solid #2d2d3e', background: '#1e1e28',
+              color: '#a78bfa', fontSize: '13px', fontWeight: 700,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.15s', flexShrink: 0,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#1DB954'; e.currentTarget.style.color = '#1DB954' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#2d2d3e'; e.currentTarget.style.color = '#a78bfa' }}
+          >?</button>
           <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? '#1DB954' : '#a78bfa', transition: 'color 0.2s' }}>PC</span>
           <button
             onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')}
@@ -944,6 +1061,9 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* ── 사용법 모달 ── */}
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </div>
   )
 }
