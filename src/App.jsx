@@ -47,7 +47,6 @@ function VDivider() {
   return <div className="w-px self-stretch shrink-0" style={{ background: '#2d2d3e' }} />
 }
 
-// HistoryRow는 App 밖에 정의 — App 안에 두면 매 렌더마다 unmount/remount 발생
 function HistoryRow({
   entry, isActive, onLoad, onStartEdit, onRemove,
   isEditing, editVal, onEditChange, onEditBlur, onEditKeyDown,
@@ -65,42 +64,30 @@ function HistoryRow({
         className="text-xs shrink-0 group-hover:text-[#a78bfa] transition-colors">
         {isActive ? '▶' : '○'}
       </span>
-
       {isEditing ? (
         <input
-          autoFocus
-          value={editVal}
-          onChange={onEditChange}
-          onFocus={e => e.target.select()}
-          onBlur={onEditBlur}
-          onKeyDown={onEditKeyDown}
+          autoFocus value={editVal} onChange={onEditChange}
+          onFocus={e => e.target.select()} onBlur={onEditBlur} onKeyDown={onEditKeyDown}
           onClick={e => e.stopPropagation()}
           className="flex-1 min-w-0 px-2 py-0.5 rounded text-sm text-white focus:outline-none"
           style={{ background: '#1e1e28', border: '1px solid #1DB954' }}
         />
       ) : (
-        <span
-          onDoubleClick={onStartEdit}
-          title="더블클릭으로 제목 편집"
+        <span onDoubleClick={onStartEdit} title="더블클릭으로 제목 편집"
           className="flex-1 min-w-0 text-sm truncate transition-colors"
-          style={{ color: isActive ? '#ffffff' : '#a78bfa' }}
-        >
+          style={{ color: isActive ? '#ffffff' : '#a78bfa' }}>
           {entry.title}
         </span>
       )}
-
-      <span className="text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ color: '#a78bfa' }}>
+      <span className="text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#a78bfa' }}>
         {formatDate(entry.savedAt ?? entry.addedAt)}
       </span>
       <button onClick={onStartEdit} title="제목 편집"
         className="opacity-0 group-hover:opacity-100 text-xs shrink-0 transition-opacity px-0.5 hover:text-white"
-        style={{ color: '#a78bfa' }}
-      >✏️</button>
+        style={{ color: '#a78bfa' }}>✏️</button>
       <button onClick={onRemove} title="삭제"
         className="opacity-0 group-hover:opacity-100 text-xs shrink-0 transition-opacity px-0.5 hover:text-red-400"
-        style={{ color: '#a78bfa' }}
-      >🗑</button>
+        style={{ color: '#a78bfa' }}>🗑</button>
     </div>
   )
 }
@@ -116,56 +103,35 @@ const HELP_STEPS = [
 
 function HelpModal({ onClose }) {
   const [dontShow, setDontShow] = useState(false)
-
   const handleClose = () => {
     if (dontShow) localStorage.setItem('cp-help-seen', '1')
     onClose()
   }
-
   return (
-    <div
-      onClick={handleClose}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 99999,
-        background: 'rgba(0,0,0,0.75)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '16px',
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          background: '#1a1a2e',
-          borderRadius: '16px',
-          padding: '28px 32px 24px',
-          width: '100%',
-          maxWidth: '480px',
-          border: '1px solid rgba(29,185,84,0.25)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
-        }}
-      >
-        {/* 제목 */}
+    <div onClick={handleClose} style={{
+      position: 'fixed', inset: 0, zIndex: 99999,
+      background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: '#1a1a2e', borderRadius: '16px', padding: '28px 32px 24px',
+        width: '100%', maxWidth: '480px',
+        border: '1px solid rgba(29,185,84,0.25)',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
           <div>
             <div style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#1DB954', marginBottom: '4px', fontWeight: 600 }}>GUIDE</div>
             <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>CopyPractice Player 사용법</h2>
           </div>
-          <button
-            onClick={handleClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a78bfa', fontSize: '20px', lineHeight: 1, padding: '2px 4px' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
-            onMouseLeave={e => e.currentTarget.style.color = '#a78bfa'}
-          >✕</button>
+          <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a78bfa', fontSize: '20px', lineHeight: 1, padding: '2px 4px' }}>✕</button>
         </div>
-
-        {/* 단계 목록 */}
         <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {HELP_STEPS.map(({ icon, text }, i) => (
             <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <span style={{
                 minWidth: '28px', height: '28px', borderRadius: '50%',
-                background: 'rgba(29,185,84,0.12)',
-                border: '1px solid rgba(29,185,84,0.3)',
+                background: 'rgba(29,185,84,0.12)', border: '1px solid rgba(29,185,84,0.3)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '11px', fontWeight: 700, color: '#1DB954', flexShrink: 0,
               }}>{i + 1}</span>
@@ -176,32 +142,17 @@ function HelpModal({ onClose }) {
             </li>
           ))}
         </ol>
-
-        {/* 구분선 */}
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '20px 0' }} />
-
-        {/* 하단 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-            <input
-              type="checkbox"
-              checked={dontShow}
-              onChange={e => setDontShow(e.target.checked)}
-              style={{ accentColor: '#1DB954', width: '14px', height: '14px', cursor: 'pointer' }}
-            />
+            <input type="checkbox" checked={dontShow} onChange={e => setDontShow(e.target.checked)}
+              style={{ accentColor: '#1DB954', width: '14px', height: '14px', cursor: 'pointer' }} />
             <span style={{ fontSize: '12px', color: '#a78bfa' }}>다시 보지 않기</span>
           </label>
-          <button
-            onClick={handleClose}
-            style={{
-              padding: '8px 24px', borderRadius: '8px', border: 'none',
-              background: '#1DB954', color: '#000000',
-              fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-              transition: 'opacity 0.15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-          >확인</button>
+          <button onClick={handleClose} style={{
+            padding: '8px 24px', borderRadius: '8px', border: 'none',
+            background: '#1DB954', color: '#000000', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+          }}>확인</button>
         </div>
       </div>
     </div>
@@ -214,11 +165,13 @@ export default function App() {
   const lyricsRef    = useRef(null)
   const lyricsRef2   = useRef(null)
   const ccClearedRef = useRef(false)
+  const mediaAudioRef = useRef(null) // 백그라운드 재생용
 
-  // ── 미디어 상태 ────────────────────────────────────────────
+  // ── 미디어 상태 ──
   const [url, setUrl]           = useState('')
   const [urlInput, setUrlInput] = useState('')
   const [fileName, setFileName] = useState('')
+  const [isAudioOnly, setIsAudioOnly] = useState(false) // 음원 파일 여부
 
   const [playing, setPlaying]             = useState(false)
   const [speed, setSpeed]                 = useState(1.0)
@@ -231,20 +184,22 @@ export default function App() {
   const [pointA, setPointA]           = useState(null)
   const [pointB, setPointB]           = useState(null)
   const [looping, setLooping]         = useState(false)
+  const [loopAll, setLoopAll]         = useState(false) // 전체 반복
   const [skipSeconds, setSkipSeconds] = useState(5)
 
-  // ── 영상 기록 ──────────────────────────────────────────────
+  // ── 모바일 영상 접기 ──
+  const [videoCollapsed, setVideoCollapsed] = useState(false)
+
+  // ── 영상 기록 ──
   const [history, setHistory]             = useState(() => readStorage(HISTORY_KEY))
   const [showHistory, setShowHistory]     = useState(() => window.innerWidth >= 768)
   const [activeVideoId, setActiveVideoId] = useState(null)
   const [editVideoId, setEditVideoId]     = useState(null)
   const [editVideoTitle, setEditVideoTitle] = useState('')
 
-  // ── 가사 상태 ──────────────────────────────────────────────
+  // ── 가사 상태 ──
   const [fontSize, setFontSize]               = useState(30)
   const [activeHighlight, setActiveHighlight] = useState(HIGHLIGHTS[0].color)
-
-  // ── 가사 라이브러리 ────────────────────────────────────────
   const [lyricsLib, setLyricsLib]           = useState(() => readStorage(LYRICS_KEY))
   const [showLyricsLib, setShowLyricsLib]   = useState(true)
   const [showSaveForm, setShowSaveForm]     = useState(false)
@@ -263,7 +218,42 @@ export default function App() {
     if (v === 'B') setActivePanel(2)
   }
 
-  // ── localStorage 헬퍼 ─────────────────────────────────────
+  // ── 미디어 세션 API (백그라운드/잠금화면 컨트롤) ──
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+    if (!url) return
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: fileName || 'CopyPractice Player',
+      artist: 'CPP',
+      album: 'cpplay.org',
+      artwork: [{ src: '/og-image.png', sizes: '1200x630', type: 'image/png' }]
+    })
+
+    navigator.mediaSession.setActionHandler('play', () => setPlaying(true))
+    navigator.mediaSession.setActionHandler('pause', () => setPlaying(false))
+    navigator.mediaSession.setActionHandler('seekbackward', () => {
+      if (playerRef.current) playerRef.current.currentTime = Math.max(0, playerRef.current.currentTime - skipSeconds)
+    })
+    navigator.mediaSession.setActionHandler('seekforward', () => {
+      if (playerRef.current) playerRef.current.currentTime = Math.min(playerRef.current.duration || 0, playerRef.current.currentTime + skipSeconds)
+    })
+
+    return () => {
+      navigator.mediaSession.setActionHandler('play', null)
+      navigator.mediaSession.setActionHandler('pause', null)
+      navigator.mediaSession.setActionHandler('seekbackward', null)
+      navigator.mediaSession.setActionHandler('seekforward', null)
+    }
+  }, [url, fileName, skipSeconds])
+
+  // 재생 상태 미디어세션 동기화
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+    navigator.mediaSession.playbackState = playing ? 'playing' : 'paused'
+  }, [playing])
+
+  // ── localStorage 헬퍼 ──
   const persistHistory = (entries) => {
     setHistory(entries)
     localStorage.setItem(HISTORY_KEY, JSON.stringify(entries))
@@ -273,7 +263,7 @@ export default function App() {
     localStorage.setItem(LYRICS_KEY, JSON.stringify(entries))
   }
 
-  // ── 영상 기록 함수 ─────────────────────────────────────────
+  // ── 영상 기록 함수 ──
   const addToHistory = (newUrl, defaultTitle) => {
     setHistory(prev => {
       const existing = prev.find(e => e.url === newUrl)
@@ -317,7 +307,7 @@ export default function App() {
     persistHistory([{ ...entry, addedAt: Date.now() }, ...history.filter(h => h.id !== entry.id)])
   }
 
-  // ── 미디어 로드 ────────────────────────────────────────────
+  // ── 미디어 로드 ──
   const disableYouTubeCaptions = (el) => {
     try { el?.api?.setOption('captions', 'track', {}) } catch {}
   }
@@ -325,6 +315,11 @@ export default function App() {
   const loadUrl = (newUrl, name = '') => {
     setUrl(newUrl)
     setFileName(name)
+    // 음원 파일 여부 판단
+    const audioExts = ['.mp3', '.aac', '.flac', '.wav', '.ogg', '.m4a']
+    const isAudio = audioExts.some(ext => newUrl.toLowerCase().includes(ext))
+    setIsAudioOnly(isAudio)
+    if (isAudio) setVideoCollapsed(true) // 음원이면 자동 접기
     setPlaying(true)
     setPlayed(0)
     setPlayedSeconds(0)
@@ -348,11 +343,13 @@ export default function App() {
     e.preventDefault()
     const trimmed = urlInput.trim()
     if (!trimmed) return
+    setIsAudioOnly(false)
+    setVideoCollapsed(false)
     loadUrl(trimmed)
     addToHistory(trimmed, 'YouTube 영상')
   }
 
-  // ── 가사 패널 헬퍼 ─────────────────────────────────────────
+  // ── 가사 패널 헬퍼 ──
   const getActiveLyricsRef = () => activePanel === 2 ? lyricsRef2 : lyricsRef
 
   const handleSaveLyrics = () => {
@@ -395,7 +392,7 @@ export default function App() {
     setEditLyricsId(null)
   }
 
-  // ── 형광펜 ─────────────────────────────────────────────────
+  // ── 형광펜 ──
   const applyHighlight = (color) => {
     document.execCommand('backColor', false, color)
     document.execCommand('foreColor', false, '#000000')
@@ -412,14 +409,13 @@ export default function App() {
     setActiveLyricsId(null)
   }
 
-  // ── 전역 키보드 ────────────────────────────────────────────
+  // ── 전역 키보드 ──
   useEffect(() => {
     if (!url) return
     const handler = (e) => {
       const el  = document.activeElement
       const tag = el?.tagName?.toUpperCase()
       const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || el?.contentEditable === 'true'
-
       if (e.code === 'Space') {
         if (isEditable) return
         e.preventDefault()
@@ -427,16 +423,12 @@ export default function App() {
         return
       }
       if (isEditable) return
-
       if (e.code === 'ArrowLeft') {
         e.preventDefault()
-        if (playerRef.current)
-          playerRef.current.currentTime = Math.max(0, playerRef.current.currentTime - skipSeconds)
+        if (playerRef.current) playerRef.current.currentTime = Math.max(0, playerRef.current.currentTime - skipSeconds)
       } else if (e.code === 'ArrowRight') {
         e.preventDefault()
-        if (playerRef.current)
-          playerRef.current.currentTime = Math.min(
-            playerRef.current.duration || 0, playerRef.current.currentTime + skipSeconds)
+        if (playerRef.current) playerRef.current.currentTime = Math.min(playerRef.current.duration || 0, playerRef.current.currentTime + skipSeconds)
       } else if (e.code === 'ArrowUp') {
         e.preventDefault()
         setVolume(v => Math.min(1, Math.round((v + 0.1) * 10) / 10))
@@ -449,7 +441,7 @@ export default function App() {
     return () => document.removeEventListener('keydown', handler)
   }, [url, skipSeconds])
 
-  // ── 재생 이벤트 ────────────────────────────────────────────
+  // ── 재생 이벤트 ──
   const handleTimeUpdate = useCallback((e) => {
     const ps  = e.target.currentTime
     const dur = e.target.duration || 0
@@ -474,12 +466,20 @@ export default function App() {
     if (looping && pointA !== null) {
       if (playerRef.current) playerRef.current.currentTime = pointA
       setPlaying(true)
+    } else if (loopAll) {
+      // 전체 반복: 처음으로
+      if (playerRef.current) playerRef.current.currentTime = 0
+      setPlaying(true)
     } else {
       setPlaying(false)
     }
-  }, [looping, pointA])
+  }, [looping, pointA, loopAll])
 
-  // ── 시크바 ─────────────────────────────────────────────────
+  // ── 재생/일시정지 버그 수정: onPlay/onPause로 실제 상태 동기화 ──
+  const handlePlay  = () => setPlaying(true)
+  const handlePause = () => setPlaying(false)
+
+  // ── 시크바 ──
   const handleSeekMouseDown = () => setSeeking(true)
   const handleSeekChange    = (e) => setPlayed(parseFloat(e.target.value))
   const handleSeekMouseUp   = (e) => {
@@ -489,11 +489,10 @@ export default function App() {
   }
   const skip = (sec) => {
     if (!playerRef.current) return
-    playerRef.current.currentTime = Math.max(
-      0, Math.min(playerRef.current.duration || 0, playerRef.current.currentTime + sec))
+    playerRef.current.currentTime = Math.max(0, Math.min(playerRef.current.duration || 0, playerRef.current.currentTime + sec))
   }
 
-  // ── A-B 반복 ───────────────────────────────────────────────
+  // ── A-B 반복 ──
   const handleSetA = () => setPointA(playedSeconds)
   const handleSetB = () => setPointB(playedSeconds)
   const handleToggleLoop = () => {
@@ -506,46 +505,26 @@ export default function App() {
 
   const volPct = Math.round(volume * 100)
 
-  // ── 스타일 헬퍼 ────────────────────────────────────────────
-  const btnBase = 'transition-colors cursor-pointer'
-
+  // ── 스타일 헬퍼 ──
   const speedBtn = (active) => ({
-    padding: '4px 10px',
-    borderRadius: '6px',
-    fontSize: '11px',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
+    padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'rgba(29,185,84,0.18)' : '#1e1e28',
     color: active ? '#1DB954' : '#a78bfa',
     boxShadow: active ? 'inset 0 0 0 1px #1DB954' : 'none',
   })
-
   const skipUnitBtn = (active) => ({
-    padding: '4px 8px',
-    borderRadius: '6px',
-    fontSize: '11px',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
+    padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'rgba(29,185,84,0.18)' : '#1e1e28',
     color: active ? '#1DB954' : '#a78bfa',
     boxShadow: active ? 'inset 0 0 0 1px #1DB954' : 'none',
   })
-
   const abBtn = (active) => ({
-    padding: '4px 12px',
-    borderRadius: '6px',
-    fontSize: '11px',
-    fontWeight: 600,
-    fontFamily: 'monospace',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
+    padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    fontFamily: 'monospace', border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'rgba(167,139,250,0.18)' : '#1e1e28',
-    color: active ? '#a78bfa' : '#a78bfa',
+    color: '#a78bfa',
     boxShadow: active ? 'inset 0 0 0 1px rgba(167,139,250,0.6)' : 'none',
   })
 
@@ -553,38 +532,25 @@ export default function App() {
     <div style={{ background: '#0f0f13' }} className="h-screen text-white flex flex-col overflow-hidden">
 
       {/* ── Header ── */}
-      <header
-        className="shrink-0 flex items-center px-4 py-3"
-        style={{ borderBottom: '1px solid #2d2d3e' }}
-      >
+      <header className="shrink-0 flex items-center px-4 py-3" style={{ borderBottom: '1px solid #2d2d3e' }}>
         <div className="flex-1" />
         <div className="flex flex-col items-center gap-0.5">
           <span style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '0.3em', color: '#1DB954', lineHeight: 1 }}>CPP</span>
           <span style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: '#a78bfa', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
-          <button
-            onClick={() => setShowHelp(true)}
-            title="사용법 보기"
-            style={{
-              width: '28px', height: '28px', borderRadius: '50%',
-              border: '1px solid #2d2d3e', background: '#1e1e28',
-              color: '#a78bfa', fontSize: '13px', fontWeight: 700,
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.15s', flexShrink: 0,
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#1DB954'; e.currentTarget.style.color = '#1DB954' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#2d2d3e'; e.currentTarget.style.color = '#a78bfa' }}
-          >?</button>
-          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? '#1DB954' : '#a78bfa', transition: 'color 0.2s' }}>PC</span>
-          <button
-            onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')}
-            style={{
-              width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-              background: viewMode === 'mobile' ? '#1DB954' : '#2d2d3e',
-              position: 'relative', transition: 'background 0.2s', flexShrink: 0,
-            }}
-          >
+          <button onClick={() => setShowHelp(true)} title="사용법 보기" style={{
+            width: '28px', height: '28px', borderRadius: '50%',
+            border: '1px solid #2d2d3e', background: '#1e1e28',
+            color: '#a78bfa', fontSize: '13px', fontWeight: 700,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>?</button>
+          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? '#1DB954' : '#a78bfa' }}>PC</span>
+          <button onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')} style={{
+            width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+            background: viewMode === 'mobile' ? '#1DB954' : '#2d2d3e',
+            position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+          }}>
             <div style={{
               position: 'absolute', top: '2px',
               left: viewMode === 'mobile' ? '22px' : '2px',
@@ -592,7 +558,7 @@ export default function App() {
               background: '#ffffff', transition: 'left 0.2s',
             }} />
           </button>
-          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? '#1DB954' : '#a78bfa', transition: 'color 0.2s' }}>모바일</span>
+          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? '#1DB954' : '#a78bfa' }}>모바일</span>
         </div>
       </header>
 
@@ -604,23 +570,15 @@ export default function App() {
       >
 
         {/* ══ LEFT — Player ══ */}
-        <div
-          className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'w-full sticky top-0 z-10 shrink-0' : 'flex-1 overflow-hidden'}`}
-          style={viewMode === 'mobile' ? { background: '#0f0f13' } : undefined}
-        >
+        <div className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'w-full sticky top-0 z-10 shrink-0' : 'flex-1 overflow-hidden'}`}
+          style={viewMode === 'mobile' ? { background: '#0f0f13' } : undefined}>
 
           {/* URL / File 입력 */}
-          <div
-            className={`shrink-0 flex gap-1.5 items-center flex-nowrap ${viewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2.5 flex-wrap'}`}
-            style={{ borderBottom: '1px solid #2d2d3e' }}
-          >
-            <button
-              onClick={() => fileInputRef.current?.click()}
+          <div className={`shrink-0 flex gap-1.5 items-center flex-nowrap ${viewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2.5 flex-wrap'}`}
+            style={{ borderBottom: '1px solid #2d2d3e' }}>
+            <button onClick={() => fileInputRef.current?.click()}
               className={`flex items-center gap-1 rounded-lg transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
-              style={{ background: '#1e1e28', color: '#a78bfa', border: '1px solid #2d2d3e' }}
-              onMouseEnter={e => e.currentTarget.style.color='#ffffff'}
-              onMouseLeave={e => e.currentTarget.style.color='#a78bfa'}
-            >
+              style={{ background: '#1e1e28', color: '#a78bfa', border: '1px solid #2d2d3e' }}>
               📂{viewMode !== 'mobile' && <span>로컬 파일</span>}
             </button>
             <input ref={fileInputRef} type="file" accept="video/*,audio/*" className="hidden" onChange={handleFileChange} />
@@ -628,33 +586,24 @@ export default function App() {
               <span className="text-xs truncate max-w-24 shrink-0" style={{ color: '#a78bfa' }} title={fileName}>{fileName}</span>
             )}
             <form onSubmit={handleYouTubeSubmit} className="flex gap-1.5 flex-1 min-w-0">
-              <input
-                type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
+              <input type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
                 placeholder={viewMode === 'mobile' ? 'YouTube URL...' : 'YouTube URL 붙여넣기...'}
                 className={`flex-1 min-w-0 rounded-lg focus:outline-none transition-colors ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
                 style={{ background: '#1e1e28', border: '1px solid #2d2d3e', color: '#ffffff' }}
-                onFocus={e => e.target.style.borderColor='#1DB954'}
-                onBlur={e => e.target.style.borderColor='#2d2d3e'}
               />
-              <button
-                type="submit"
-                className={`flex items-center gap-1 rounded-lg font-medium transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm gap-1.5'}`}
-                style={{ background: '#1DB954', color: '#000000' }}
-                onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity='1'}
-              >▶{viewMode !== 'mobile' && ' 재생'}</button>
+              <button type="submit"
+                className={`flex items-center gap-1 rounded-lg font-medium transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'}`}
+                style={{ background: '#1DB954', color: '#000000' }}>
+                ▶{viewMode !== 'mobile' && ' 재생'}
+              </button>
             </form>
           </div>
 
           {/* 영상 기록 */}
           <div className="shrink-0" style={{ borderBottom: '1px solid #2d2d3e' }}>
-            <button
-              onClick={() => setShowHistory(p => !p)}
+            <button onClick={() => setShowHistory(p => !p)}
               className="w-full flex items-center gap-2 px-4 py-2 text-left transition-colors"
-              style={{ color: '#a78bfa' }}
-              onMouseEnter={e => e.currentTarget.style.background='#1e1e28'}
-              onMouseLeave={e => e.currentTarget.style.background='transparent'}
-            >
+              style={{ color: '#a78bfa' }}>
               <span className="text-xs font-medium">🕐 영상 기록</span>
               {history.length > 0 && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: '#1e1e28', color: '#a78bfa' }}>
@@ -678,7 +627,7 @@ export default function App() {
                       onEditChange={e => setEditVideoTitle(e.target.value)}
                       onEditBlur={commitEditVideo}
                       onEditKeyDown={e => {
-                        if (e.key === 'Enter')  commitEditVideo()
+                        if (e.key === 'Enter') commitEditVideo()
                         if (e.key === 'Escape') setEditVideoId(null)
                       }}
                     />
@@ -688,8 +637,23 @@ export default function App() {
             )}
           </div>
 
-          {/* 영상 플레이어 */}
-          <div className={`bg-black relative ${viewMode === 'mobile' ? 'aspect-video' : 'flex-[4] min-h-0'}`}>
+          {/* 영상 플레이어 — 모바일에서 접기/펼치기 */}
+          {viewMode === 'mobile' && url && (
+            <button
+              onClick={() => setVideoCollapsed(p => !p)}
+              className="w-full flex items-center justify-between px-4 py-1.5 text-xs"
+              style={{ background: '#16161d', color: '#a78bfa', borderBottom: '1px solid #2d2d3e', border: 'none', cursor: 'pointer' }}
+            >
+              <span>{isAudioOnly ? '🎵 음원 재생 중' : '🎬 영상'}</span>
+              <span>{videoCollapsed ? '▼ 펼치기' : '▲ 접기'}</span>
+            </button>
+          )}
+
+          <div className={`bg-black relative ${
+            viewMode === 'mobile'
+              ? videoCollapsed ? 'hidden' : 'aspect-video'
+              : 'flex-[4] min-h-0'
+          }`}>
             {url ? (
               <>
                 <ReactPlayer
@@ -698,6 +662,8 @@ export default function App() {
                   onTimeUpdate={handleTimeUpdate}
                   onDurationChange={handleDurationChange}
                   onEnded={handleEnded}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
                   width="100%" height="100%"
                   config={{ youtube: { cc_load_policy: 0 } }}
                 />
@@ -712,10 +678,9 @@ export default function App() {
           </div>
 
           {/* 컨트롤 패널 */}
-          <div
-            className={`px-4 py-3 flex flex-col overflow-y-auto ${viewMode === 'mobile' ? 'shrink-0 gap-3' : 'flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}`}
-            style={{ background: '#16161d', borderTop: '1px solid #2d2d3e' }}
-          >
+          <div className={`px-4 py-3 flex flex-col overflow-y-auto ${viewMode === 'mobile' ? 'shrink-0 gap-3' : 'flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}`}
+            style={{ background: '#16161d', borderTop: '1px solid #2d2d3e' }}>
+
             {/* 시크바 */}
             <div className="flex items-center gap-3 text-xs font-mono" style={{ color: '#a78bfa' }}>
               <span className="w-11 text-right shrink-0">{formatTime(playedSeconds)}</span>
@@ -738,23 +703,32 @@ export default function App() {
 
             {/* 재생 · 속도 · 스킵 · 볼륨 */}
             <div className={`flex items-center flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-2 pb-0.5' : 'gap-3 flex-wrap'}`}>
+              {/* 재생/일시정지 */}
               <button
                 onClick={() => setPlaying(p => !p)} disabled={!url}
-                aria-label={playing ? '일시정지' : '재생'}
                 className="w-11 h-11 rounded-full flex items-center justify-center text-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                 style={{ background: '#1DB954', color: '#000000' }}
-                onMouseEnter={e => !e.currentTarget.disabled && (e.currentTarget.style.opacity='0.85')}
-                onMouseLeave={e => e.currentTarget.style.opacity='1'}
               >{playing ? '⏸' : '▶'}</button>
+
+              {/* 전체 반복 버튼 */}
+              <button
+                onClick={() => setLoopAll(p => !p)} disabled={!url}
+                title="전체 반복"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all disabled:opacity-30 shrink-0"
+                style={{
+                  background: loopAll ? 'rgba(29,185,84,0.18)' : '#1e1e28',
+                  color: loopAll ? '#1DB954' : '#a78bfa',
+                  border: loopAll ? '1px solid #1DB954' : '1px solid #2d2d3e',
+                  cursor: 'pointer',
+                }}
+              >🔁</button>
 
               <VDivider />
 
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="text-xs" style={{ color: '#a78bfa' }}>속도</span>
                 {SPEEDS.map(s => (
-                  <button key={s} onClick={() => setSpeed(s)} style={speedBtn(speed === s)}>
-                    {s}x
-                  </button>
+                  <button key={s} onClick={() => setSpeed(s)} style={speedBtn(speed === s)}>{s}x</button>
                 ))}
               </div>
 
@@ -764,17 +738,13 @@ export default function App() {
                 <span className="text-xs" style={{ color: '#a78bfa' }}>스킵</span>
                 <button onClick={() => skip(-skipSeconds)} disabled={!url}
                   className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
-                  style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}
-                >◀◀</button>
+                  style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}>◀◀</button>
                 <button onClick={() => skip(skipSeconds)} disabled={!url}
                   className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
-                  style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}
-                >▶▶</button>
+                  style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}>▶▶</button>
                 <div className="flex gap-1 ml-1">
                   {SKIP_UNITS.map(u => (
-                    <button key={u} onClick={() => setSkipSeconds(u)} style={skipUnitBtn(skipSeconds === u)}>
-                      {u}s
-                    </button>
+                    <button key={u} onClick={() => setSkipSeconds(u)} style={skipUnitBtn(skipSeconds === u)}>{u}s</button>
                   ))}
                 </div>
               </div>
@@ -784,7 +754,6 @@ export default function App() {
               <div className="flex items-center gap-1.5 shrink-0 text-xs" style={{ color: '#a78bfa' }}>
                 <span>{volPct === 0 ? '🔇' : volPct < 50 ? '🔉' : '🔊'}</span>
                 <span className="font-mono w-8">{volPct}%</span>
-                <span style={{ color: '#2d2d3e' }}>↑↓</span>
               </div>
             </div>
 
@@ -804,13 +773,8 @@ export default function App() {
               <button onClick={handleToggleLoop} disabled={!canLoop}
                 className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
                 style={{
-                  padding: '4px 12px',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  border: 'none',
-                  cursor: canLoop ? 'pointer' : 'not-allowed',
-                  transition: 'all 0.15s',
+                  padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+                  border: 'none', cursor: canLoop ? 'pointer' : 'not-allowed',
                   opacity: !canLoop ? 0.3 : 1,
                   background: looping ? 'rgba(29,185,84,0.18)' : '#1e1e28',
                   color: looping ? '#1DB954' : '#a78bfa',
@@ -820,16 +784,11 @@ export default function App() {
               <button onClick={handleClearAB} disabled={pointA === null && pointB === null}
                 className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
                 style={{
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  background: '#1e1e28',
-                  color: '#a78bfa',
+                  padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
+                  border: 'none', cursor: 'pointer',
+                  background: '#1e1e28', color: '#a78bfa',
                   opacity: pointA === null && pointB === null ? 0.3 : 1,
-                }}
-              >✕</button>
+                }}>✕</button>
             </div>
           </div>
         </div>
@@ -837,36 +796,21 @@ export default function App() {
         {/* ══ RIGHT — 가사 패널 ══ */}
         <div className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'border-t' : 'flex-1 border-l'} border-[#2d2d3e]`}>
           {/* 가사 툴바 */}
-          <div
-            className="shrink-0 px-4 py-2.5 flex items-center gap-3 flex-wrap"
-            style={{ borderBottom: '1px solid #2d2d3e', background: '#16161d' }}
-          >
+          <div className="shrink-0 px-4 py-2.5 flex items-center gap-3 flex-wrap"
+            style={{ borderBottom: '1px solid #2d2d3e', background: '#16161d' }}>
             <span className="text-xs font-medium shrink-0" style={{ color: '#a78bfa' }}>LYRICS</span>
-
             <VDivider />
-
-            {/* 폰트 크기 */}
             <div className="flex items-center gap-1 shrink-0">
               {FONT_SIZES.map(({ size, label }) => (
-                <button key={size} onClick={() => setFontSize(size)}
-                  style={{
-                    padding: '3px 8px',
-                    borderRadius: '5px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    background: fontSize === size ? '#2d2d3e' : 'transparent',
-                    color: fontSize === size ? '#ffffff' : '#a78bfa',
-                  }}
-                >{label}</button>
+                <button key={size} onClick={() => setFontSize(size)} style={{
+                  padding: '3px 8px', borderRadius: '5px', fontSize: '11px', fontWeight: 600,
+                  border: 'none', cursor: 'pointer',
+                  background: fontSize === size ? '#2d2d3e' : 'transparent',
+                  color: fontSize === size ? '#ffffff' : '#a78bfa',
+                }}>{label}</button>
               ))}
             </div>
-
             <VDivider />
-
-            {/* 형광펜 */}
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="text-xs" style={{ color: '#a78bfa' }}>형광</span>
               {HIGHLIGHTS.map(({ color, bg }) => (
@@ -876,122 +820,67 @@ export default function App() {
                   style={activeHighlight === color ? { outline: '2px solid #ffffff', outlineOffset: '2px' } : {}}
                 />
               ))}
-              <button
-                onMouseDown={e => { e.preventDefault(); removeHighlight() }}
-                style={{
-                  padding: '2px 8px',
-                  borderRadius: '5px',
-                  fontSize: '11px',
-                  border: '1px solid #2d2d3e',
-                  cursor: 'pointer',
-                  background: 'transparent',
-                  color: '#a78bfa',
-                  transition: 'all 0.15s',
-                }}
-              >제거</button>
+              <button onMouseDown={e => { e.preventDefault(); removeHighlight() }} style={{
+                padding: '2px 8px', borderRadius: '5px', fontSize: '11px',
+                border: '1px solid #2d2d3e', cursor: 'pointer',
+                background: 'transparent', color: '#a78bfa',
+              }}>제거</button>
             </div>
-
             <VDivider />
-
-            {/* 저장 버튼 */}
-            <button
-              onClick={() => { setShowSaveForm(p => !p); setSaveTitle('') }}
-              style={{
-                padding: '4px 12px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                background: showSaveForm ? 'rgba(29,185,84,0.18)' : '#1e1e28',
-                color: showSaveForm ? '#1DB954' : '#a78bfa',
-                boxShadow: showSaveForm ? 'inset 0 0 0 1px #1DB954' : 'none',
-              }}
-            >💾 저장</button>
-
-            {/* 패널 뷰 전환 + 지우기 */}
+            <button onClick={() => { setShowSaveForm(p => !p); setSaveTitle('') }} style={{
+              padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+              border: 'none', cursor: 'pointer',
+              background: showSaveForm ? 'rgba(29,185,84,0.18)' : '#1e1e28',
+              color: showSaveForm ? '#1DB954' : '#a78bfa',
+              boxShadow: showSaveForm ? 'inset 0 0 0 1px #1DB954' : 'none',
+            }}>💾 저장</button>
             <div className="ml-auto flex items-center gap-2">
-              {[
-                { key: 'A',  label: 'A' },
-                { key: 'AB', label: 'A│B' },
-                { key: 'B',  label: 'B' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => switchLyricsView(key)}
+              {[{ key: 'A', label: 'A' }, { key: 'AB', label: 'A│B' }, { key: 'B', label: 'B' }].map(({ key, label }) => (
+                <button key={key} onClick={() => switchLyricsView(key)}
                   className="min-h-[44px] md:min-h-[28px]"
                   style={{
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
+                    padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+                    border: 'none', cursor: 'pointer',
                     background: lyricsView === key ? 'rgba(29,185,84,0.18)' : '#1e1e28',
                     color: lyricsView === key ? '#1DB954' : '#a78bfa',
                     boxShadow: lyricsView === key ? 'inset 0 0 0 1px #1DB954' : 'none',
-                  }}
-                >{label}</button>
+                  }}>{label}</button>
               ))}
               <div style={{ width: '1px', height: '16px', background: '#2d2d3e', flexShrink: 0 }} />
-              <button onClick={clearLyrics}
-                style={{
-                  fontSize: '11px', background: 'none', border: 'none',
-                  cursor: 'pointer', color: '#a78bfa', transition: 'color 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.color='#ffffff'}
-                onMouseLeave={e => e.currentTarget.style.color='#a78bfa'}
-              >지우기</button>
+              <button onClick={clearLyrics} style={{
+                fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', color: '#a78bfa',
+              }}>지우기</button>
             </div>
           </div>
 
           {/* 저장 폼 */}
           {showSaveForm && (
-            <div
-              className="shrink-0 flex items-center gap-2 px-4 py-2.5"
-              style={{ background: '#16161d', borderBottom: '1px solid #2d2d3e' }}
-            >
+            <div className="shrink-0 flex items-center gap-2 px-4 py-2.5"
+              style={{ background: '#16161d', borderBottom: '1px solid #2d2d3e' }}>
               <span className="text-xs shrink-0" style={{ color: '#a78bfa' }}>제목</span>
-              <input
-                autoFocus
-                value={saveTitle}
-                onChange={e => setSaveTitle(e.target.value)}
+              <input autoFocus value={saveTitle} onChange={e => setSaveTitle(e.target.value)}
                 onKeyDown={e => {
-                  if (e.key === 'Enter')  handleSaveLyrics()
+                  if (e.key === 'Enter') handleSaveLyrics()
                   if (e.key === 'Escape') setShowSaveForm(false)
                 }}
                 placeholder="가사 제목을 입력하세요..."
-                className="flex-1 px-3 py-1.5 rounded text-sm focus:outline-none transition-colors"
+                className="flex-1 px-3 py-1.5 rounded text-sm focus:outline-none"
                 style={{ background: '#1e1e28', border: '1px solid #2d2d3e', color: '#ffffff' }}
-                onFocus={e => e.target.style.borderColor='#1DB954'}
-                onBlur={e => e.target.style.borderColor='#2d2d3e'}
               />
               <button onClick={handleSaveLyrics}
-                className="px-3 py-1.5 rounded text-sm font-medium transition-all shrink-0"
-                style={{ background: '#1DB954', color: '#000000', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.opacity='0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity='1'}
-              >저장</button>
+                className="px-3 py-1.5 rounded text-sm font-medium shrink-0"
+                style={{ background: '#1DB954', color: '#000000', border: 'none', cursor: 'pointer' }}>저장</button>
               <button onClick={() => setShowSaveForm(false)}
-                className="px-3 py-1.5 rounded text-sm shrink-0 transition-colors"
-                style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.color='#ffffff'}
-                onMouseLeave={e => e.currentTarget.style.color='#a78bfa'}
-              >취소</button>
+                className="px-3 py-1.5 rounded text-sm shrink-0"
+                style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}>취소</button>
             </div>
           )}
 
           {/* 가사 라이브러리 */}
           <div className="shrink-0" style={{ borderBottom: '1px solid #2d2d3e' }}>
-            <button
-              onClick={() => setShowLyricsLib(p => !p)}
-              className="w-full flex items-center gap-2 px-4 py-2 text-left transition-colors"
-              style={{ color: '#a78bfa', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              onMouseEnter={e => e.currentTarget.style.background='#1e1e28'}
-              onMouseLeave={e => e.currentTarget.style.background='transparent'}
-            >
+            <button onClick={() => setShowLyricsLib(p => !p)}
+              className="w-full flex items-center gap-2 px-4 py-2 text-left"
+              style={{ color: '#a78bfa', background: 'transparent', border: 'none', cursor: 'pointer' }}>
               <span className="text-xs font-medium">📚 저장된 가사</span>
               {lyricsLib.length > 0 && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: '#1e1e28', color: '#a78bfa' }}>
@@ -1015,7 +904,7 @@ export default function App() {
                       onEditChange={e => setEditLyricsTitle(e.target.value)}
                       onEditBlur={commitEditLyrics}
                       onEditKeyDown={e => {
-                        if (e.key === 'Enter')  commitEditLyrics()
+                        if (e.key === 'Enter') commitEditLyrics()
                         if (e.key === 'Escape') setEditLyricsId(null)
                       }}
                     />
@@ -1027,33 +916,25 @@ export default function App() {
 
           {/* 가사 편집 영역 */}
           <div className={viewMode === 'mobile' ? 'flex' : 'flex-1 flex overflow-hidden'}>
-            {/* A 패널 */}
-            <div
-              ref={lyricsRef}
-              contentEditable suppressContentEditableWarning spellCheck={false}
+            <div ref={lyricsRef} contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(1)}
-              data-placeholder={'A 패널\n\n가사를 붙여넣거나 직접 입력하세요.\n선택 후 형광펜으로 강조할 수 있습니다.'}
+              data-placeholder={'A 패널\n\n가사를 붙여넣거나 직접 입력하세요.'}
               style={{
                 display: lyricsView === 'B' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,
                 background: activePanel === 1 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
                 borderRight: lyricsView === 'AB' ? `1px solid ${activePanel === 1 ? 'rgba(29,185,84,0.2)' : '#2d2d3e'}` : 'none',
-                transition: 'background 0.2s, border-color 0.2s',
                 minHeight: viewMode === 'mobile' ? '60vh' : undefined,
               }}
               className={`flex-1 p-5 text-white leading-relaxed focus:outline-none ${viewMode === 'mobile' ? '' : 'overflow-y-auto'}`}
             />
-            {/* B 패널 */}
-            <div
-              ref={lyricsRef2}
-              contentEditable suppressContentEditableWarning spellCheck={false}
+            <div ref={lyricsRef2} contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(2)}
-              data-placeholder={'B 패널\n\n가사를 붙여넣거나 직접 입력하세요.\n선택 후 형광펜으로 강조할 수 있습니다.'}
+              data-placeholder={'B 패널\n\n가사를 붙여넣거나 직접 입력하세요.'}
               style={{
                 display: lyricsView === 'A' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,
                 background: activePanel === 2 ? 'rgba(29,185,84,0.03)' : '#0f0f13',
-                transition: 'background 0.2s',
                 minHeight: viewMode === 'mobile' ? '60vh' : undefined,
               }}
               className={`flex-1 p-5 text-white leading-relaxed focus:outline-none ${viewMode === 'mobile' ? '' : 'overflow-y-auto'}`}
@@ -1062,7 +943,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── 사용법 모달 ── */}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </div>
   )
