@@ -24,8 +24,11 @@ const LYRICS_KEY  = 'cp-lyrics'
 
 function formatTime(sec) {
   if (!sec || sec < 0) return '0:00'
-  const m = Math.floor(sec / 60)
-  const s = Math.floor(sec % 60).toString().padStart(2, '0')
+  const totalSec = Math.floor(sec)
+  const h = Math.floor(totalSec / 3600)
+  const m = Math.floor((totalSec % 3600) / 60)
+  const s = (totalSec % 60).toString().padStart(2, '0')
+  if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s}`
   return `${m}:${s}`
 }
 
