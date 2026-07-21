@@ -241,18 +241,18 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       className="relative flex-1 select-none"
-      style={{ height: '32px', touchAction: 'none', cursor: 'pointer' }}
+      style={{ height: '44px', touchAction: 'none', cursor: 'pointer' }}
     >
-      {/* 트랙 배경 */}
-      <div className="absolute left-0 right-0 top-3 rounded-full pointer-events-none"
-        style={{ height: '4px', background: '#2d2d3e' }} />
+      {/* 트랙 배경 (기존 4px의 3배 두께) */}
+      <div className="absolute left-0 right-0 top-4 -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ height: '12px', background: '#2d2d3e' }} />
       {/* 재생 진행 */}
-      <div className="absolute left-0 top-3 rounded-full pointer-events-none"
-        style={{ height: '4px', width: `${displayRatio * 100}%`, background: '#1DB954' }} />
+      <div className="absolute left-0 top-4 -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ height: '12px', width: `${displayRatio * 100}%`, background: '#1DB954' }} />
 
       {/* 시간 눈금 */}
       {ticks.map(t => (
-        <div key={t} className="absolute top-[18px] pointer-events-none"
+        <div key={t} className="absolute top-[28px] pointer-events-none"
           style={{ left: `${(t / duration) * 100}%`, transform: 'translateX(-50%)', textAlign: 'center' }}>
           <div style={{ width: '1px', height: '4px', background: '#3d3d52', margin: '0 auto' }} />
           <span style={{ fontSize: '9px', color: '#5a5a72', whiteSpace: 'nowrap' }}>{formatTime(t)}</span>
@@ -261,16 +261,16 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
 
       {/* A/B 구간 마커 */}
       {pointA !== null && duration > 0 && (
-        <div className="absolute top-3 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
+        <div className="absolute top-4 -translate-y-1/2 w-1.5 h-5 rounded-sm pointer-events-none"
           style={{ left: `${(pointA / duration) * 100}%`, background: '#a78bfa' }} />
       )}
       {pointB !== null && duration > 0 && (
-        <div className="absolute top-3 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
+        <div className="absolute top-4 -translate-y-1/2 w-1.5 h-5 rounded-sm pointer-events-none"
           style={{ left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
       )}
 
       {/* 현재 위치 마커: ▽─│─△ (트랙 중앙을 향해 안쪽으로 수렴) */}
-      <div className="absolute top-3 flex flex-col items-center pointer-events-none"
+      <div className="absolute top-4 flex flex-col items-center pointer-events-none"
         style={{ left: `${displayRatio * 100}%`, transform: 'translate(-50%, -50%)' }}>
         <div style={{
           width: 0, height: 0,
