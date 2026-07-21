@@ -269,19 +269,19 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
           style={{ left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
       )}
 
-      {/* 현재 위치 마커: △─│─▽ */}
+      {/* 현재 위치 마커: ▽─│─△ (트랙 중앙을 향해 안쪽으로 수렴) */}
       <div className="absolute top-3 flex flex-col items-center pointer-events-none"
         style={{ left: `${displayRatio * 100}%`, transform: 'translate(-50%, -50%)' }}>
         <div style={{
           width: 0, height: 0,
           borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-          borderBottom: '6px solid #1DB954',
+          borderTop: '6px solid #1DB954',
         }} />
         <div style={{ width: '2px', height: '10px', background: '#1DB954' }} />
         <div style={{
           width: 0, height: 0,
           borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-          borderTop: '6px solid #1DB954',
+          borderBottom: '6px solid #1DB954',
         }} />
       </div>
     </div>
