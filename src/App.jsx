@@ -191,7 +191,7 @@ function HelpModal({ onClose }) {
   )
 }
 
-function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, onSeekEnd, compact = false }) {
+function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, onSeekEnd }) {
   const trackRef      = useRef(null)
   const [dragging, setDragging]   = useState(false)
   const [dragRatio, setDragRatio] = useState(null)
@@ -229,22 +229,22 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
   }
 
   const displayRatio = dragging && dragRatio !== null ? dragRatio : played
-  // 모바일은 h:mm:ss 라벨이 넓어져 겹치기 쉬우므로 눈금 개수를 줄인다
-  const interval = pickTickInterval(duration, compact ? 5 : 10)
+  // h:mm:ss 라벨은 m:ss보다 넓어 겹치기 쉬우므로 눈금 개수를 적게 유지한다
+  const interval = pickTickInterval(duration, 5)
   const ticks = []
   if (duration > 0) {
     for (let t = 0; t <= duration + 0.001; t += interval) ticks.push(t)
   }
 
-  // 트랙 두께는 고정, 그 외 세로 여백은 compact(모바일)에서 축소
+  // 트랙 두께는 고정, 그 외 세로 여백은 최소한으로 압축 (데스크톱 컨트롤 패널도 세 줄이 모두 들어와야 함)
   const trackH   = 12
-  const centerY  = compact ? 12 : 16
-  const tickTop  = compact ? 20 : 28
-  const abH      = compact ? 16 : 20
-  const posLineH = compact ? 7 : 10
-  const posTriB  = compact ? 5 : 6
-  const containerH = compact ? 36 : 44
-  const tickFont = compact ? 8 : 9
+  const centerY  = 12
+  const tickTop  = 20
+  const abH      = 16
+  const posLineH = 7
+  const posTriB  = 5
+  const containerH = 36
+  const tickFont = 8
 
   return (
     <div
@@ -820,14 +820,12 @@ export default function App() {
             )}
           </div>
 
-          {/* 컨트롤 패널 */}
-          <div className={viewMode === 'mobile'
-            ? 'px-3 py-2 flex flex-col overflow-y-auto shrink-0 gap-1.5'
-            : 'px-4 py-3 flex flex-col overflow-y-auto flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}
+          {/* 컨트롤 패널 — 세 줄(시크바/재생·속도·스킵·볼륨/A-B)이 항상 다 보이도록 압축, 공간이 부족하면 스크롤 */}
+          <div className={`px-3 py-2 flex flex-col overflow-y-auto gap-1.5 ${viewMode === 'mobile' ? 'shrink-0' : 'flex-[1] min-h-0'}`}
             style={{ background: '#16161d', borderTop: '1px solid #2d2d3e' }}>
 
             {/* 시크바 */}
-            <div className="flex items-center gap-2 text-xs font-mono" style={{ color: '#a78bfa' }}>
+            <div className="flex items-center gap-2 text-xs font-mono shrink-0" style={{ color: '#a78bfa' }}>
               <span className="w-11 text-right shrink-0">{formatTime(playedSeconds)}</span>
               <SeekBar
                 played={played} duration={duration}
@@ -835,13 +833,12 @@ export default function App() {
                 onSeekStart={handleSeekStart}
                 onSeekChange={handleSeekChange}
                 onSeekEnd={handleSeekEnd}
-                compact={viewMode === 'mobile'}
               />
               <span className="w-11 shrink-0">{formatTime(duration)}</span>
             </div>
 
-            {/* 재생 · 속도 · 스킵 · 볼륨 */}
-            <div className={`flex items-center flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-1.5' : 'gap-3 flex-wrap'}`}>
+            {/* 재생 · 속도 · 스킵 · 볼륨 — 줄바꿈 시 세로 공간이 2배로 늘어나므로 한 줄 유지 + 가로 스크롤 */}
+            <div className={`flex items-center shrink-0 flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-1.5' : 'gap-2'}`}>
               {/* 재생/일시정지 */}
               <button
                 onClick={() => setPlaying(p => !p)} disabled={!url}
@@ -896,8 +893,8 @@ export default function App() {
               </div>
             </div>
 
-            {/* A-B 반복 */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+            {/* A-B 반복 — 줄바꿈 시 세로 공간이 늘어나므로 한 줄 유지 + 가로 스크롤 */}
+            <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto shrink-0">
               <span className="text-xs font-medium shrink-0" style={{ color: '#a78bfa' }}>🔂 구간 반복</span>
               <button onClick={handleSetA} disabled={!url}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
