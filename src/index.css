@@ -1,31 +1,52 @@
 @import "tailwindcss";
 
+:root {
+  /* 테마 A: 다크 (기본) */
+  --cp-bg: #0f0f13;
+  --cp-panel: #16161d;
+  --cp-panel-alt: #1e1e28;
+  --cp-border: #2d2d3e;
+  --cp-text: #ffffff;
+  --cp-text-muted: #a78bfa;
+  --cp-accent: #1DB954;
+  --cp-accent-text: #000000;
+}
+
+:root[data-theme='warm'] {
+  /* 테마 B: 웜 (아날로그 스튜디오/카세트덱 컨셉) */
+  --cp-bg: #f3ede1;
+  --cp-panel: #ece3d2;
+  --cp-panel-alt: #e2d5bc;
+  --cp-border: #d3c3a0;
+  --cp-text: #33291f;
+  --cp-text-muted: #8a6a3f;
+  --cp-accent: #d3691e;
+  --cp-accent-text: #ffffff;
+}
+
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: #0f0f13;
-  color: #ffffff;
+  background: var(--cp-bg);
+  color: var(--cp-text);
   font-family: 'Orbitron', sans-serif;
-}
-
-input[type='range'] {
-  accent-color: #1DB954;
+  transition: background 0.2s, color 0.2s;
 }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #2d2d3e;
+  background: var(--cp-border);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3d3d52;
+  background: color-mix(in srgb, var(--cp-border) 60%, var(--cp-text) 40%);
 }
 
 [contenteditable]:empty::before {
   content: attr(data-placeholder);
-  color: rgba(167,139,250,0.35);
+  color: color-mix(in srgb, var(--cp-text-muted) 35%, transparent);
   pointer-events: none;
   white-space: pre-line;
   font-family: 'Orbitron', sans-serif;
