@@ -43,6 +43,36 @@ function readStorage(key) {
   try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] }
 }
 
+// ── 오디오 파일 판별 & react-player <audio> 강제 렌더링 ──
+const AUDIO_EXT_RE = /\.(mp3|aac|flac|wav|ogg|m4a)$/i
+// react-player의 내부 AUDIO_EXTENSIONS 정규식에 없는 확장자는 인식되는 확장자로 대체 힌트를 준다
+const AUDIO_FRAGMENT_ALIAS = { ogg: 'oga', flac: 'mp3' }
+
+function isAudioFileName(name = '') {
+  return AUDIO_EXT_RE.test(name)
+}
+
+// blob URL 뒤에 #a.{ext} fragment를 붙여 react-player가 <audio> 태그로 렌더링하도록 힌트를 준다
+function withAudioHint(rawUrl, name = '') {
+  if (!rawUrl.startsWith('blob:')) return rawUrl
+  if (/#a\.[a-z0-9]+$/i.test(rawUrl)) return rawUrl
+  const match = name.match(/\.([a-zA-Z0-9]+)$/)
+  const ext = match ? match[1].toLowerCase() : 'mp3'
+  const hintExt = AUDIO_FRAGMENT_ALIAS[ext] || ext
+  return `${rawUrl}#a.${hintExt}`
+}
+
+// 재생시간에 맞춰 5초~1시간 사이 적당한 눈금 간격을 고른다
+const TICK_INTERVALS = [5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600]
+function pickTickInterval(duration) {
+  if (!duration || duration <= 0) return 5
+  const maxTicks = 10
+  for (const interval of TICK_INTERVALS) {
+    if (duration / interval <= maxTicks) return interval
+  }
+  return TICK_INTERVALS[TICK_INTERVALS.length - 1]
+}
+
 function VDivider() {
   return <div className="w-px self-stretch shrink-0" style={{ background: '#2d2d3e' }} />
 }
@@ -159,6 +189,105 @@ function HelpModal({ onClose }) {
   )
 }
 
+function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, onSeekEnd }) {
+  const trackRef      = useRef(null)
+  const [dragging, setDragging]   = useState(false)
+  const [dragRatio, setDragRatio] = useState(null)
+
+  const ratioFromEvent = useCallback((e) => {
+    const track = trackRef.current
+    if (!track) return 0
+    const rect = track.getBoundingClientRect()
+    if (rect.width <= 0) return 0
+    return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
+  }, [])
+
+  const handlePointerDown = (e) => {
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    const ratio = ratioFromEvent(e)
+    setDragging(true)
+    setDragRatio(ratio)
+    onSeekStart()
+    onSeekChange(ratio)
+  }
+  const handlePointerMove = (e) => {
+    if (!dragging) return
+    const ratio = ratioFromEvent(e)
+    setDragRatio(ratio)
+    onSeekChange(ratio)
+  }
+  const endDrag = (e) => {
+    if (!dragging) return
+    const ratio = ratioFromEvent(e)
+    setDragging(false)
+    setDragRatio(null)
+    try { e.currentTarget.releasePointerCapture(e.pointerId) } catch { /* noop */ }
+    onSeekEnd(ratio)
+  }
+
+  const displayRatio = dragging && dragRatio !== null ? dragRatio : played
+  const interval = pickTickInterval(duration)
+  const ticks = []
+  if (duration > 0) {
+    for (let t = 0; t <= duration + 0.001; t += interval) ticks.push(t)
+  }
+
+  return (
+    <div
+      ref={trackRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      className="relative flex-1 select-none"
+      style={{ height: '32px', touchAction: 'none', cursor: 'pointer' }}
+    >
+      {/* 트랙 배경 */}
+      <div className="absolute left-0 right-0 top-3 rounded-full pointer-events-none"
+        style={{ height: '4px', background: '#2d2d3e' }} />
+      {/* 재생 진행 */}
+      <div className="absolute left-0 top-3 rounded-full pointer-events-none"
+        style={{ height: '4px', width: `${displayRatio * 100}%`, background: '#1DB954' }} />
+
+      {/* 시간 눈금 */}
+      {ticks.map(t => (
+        <div key={t} className="absolute top-[18px] pointer-events-none"
+          style={{ left: `${(t / duration) * 100}%`, transform: 'translateX(-50%)', textAlign: 'center' }}>
+          <div style={{ width: '1px', height: '4px', background: '#3d3d52', margin: '0 auto' }} />
+          <span style={{ fontSize: '9px', color: '#5a5a72', whiteSpace: 'nowrap' }}>{formatTime(t)}</span>
+        </div>
+      ))}
+
+      {/* A/B 구간 마커 */}
+      {pointA !== null && duration > 0 && (
+        <div className="absolute top-3 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
+          style={{ left: `${(pointA / duration) * 100}%`, background: '#a78bfa' }} />
+      )}
+      {pointB !== null && duration > 0 && (
+        <div className="absolute top-3 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
+          style={{ left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
+      )}
+
+      {/* 현재 위치 마커: △─│─▽ */}
+      <div className="absolute top-3 flex flex-col items-center pointer-events-none"
+        style={{ left: `${displayRatio * 100}%`, transform: 'translate(-50%, -50%)' }}>
+        <div style={{
+          width: 0, height: 0,
+          borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+          borderBottom: '6px solid #1DB954',
+        }} />
+        <div style={{ width: '2px', height: '10px', background: '#1DB954' }} />
+        <div style={{
+          width: 0, height: 0,
+          borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+          borderTop: '6px solid #1DB954',
+        }} />
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const playerRef    = useRef(null)
   const fileInputRef = useRef(null)
@@ -264,15 +393,15 @@ export default function App() {
   }
 
   // ── 영상 기록 함수 ──
-  const addToHistory = (newUrl, defaultTitle) => {
+  const addToHistory = (newUrl, defaultTitle, isAudio = false) => {
     setHistory(prev => {
       const existing = prev.find(e => e.url === newUrl)
       let updated
       if (existing) {
-        updated = [{ ...existing, addedAt: Date.now() }, ...prev.filter(e => e.url !== newUrl)]
+        updated = [{ ...existing, addedAt: Date.now(), isAudio }, ...prev.filter(e => e.url !== newUrl)]
         setActiveVideoId(existing.id)
       } else {
-        const entry = { id: crypto.randomUUID(), url: newUrl, title: defaultTitle, addedAt: Date.now() }
+        const entry = { id: crypto.randomUUID(), url: newUrl, title: defaultTitle, addedAt: Date.now(), isAudio }
         updated = [entry, ...prev]
         setActiveVideoId(entry.id)
       }
@@ -302,7 +431,7 @@ export default function App() {
 
   const loadFromHistory = (entry) => {
     if (editVideoId) return
-    loadUrl(entry.url, entry.title)
+    loadUrl(entry.url, entry.title, entry.isAudio)
     setActiveVideoId(entry.id)
     persistHistory([{ ...entry, addedAt: Date.now() }, ...history.filter(h => h.id !== entry.id)])
   }
@@ -312,12 +441,13 @@ export default function App() {
     try { el?.api?.setOption('captions', 'track', {}) } catch {}
   }
 
-  const loadUrl = (newUrl, name = '') => {
-    setUrl(newUrl)
+  const loadUrl = (newUrl, name = '', explicitIsAudio) => {
+    // 음원 파일 여부 판단: 실제 파일명(name)의 확장자 기준 (blob URL 자체는 확장자 정보가 없음)
+    const isAudio = explicitIsAudio !== undefined ? explicitIsAudio : isAudioFileName(name)
+    // 로컬 오디오 파일이면 <audio> 태그로 렌더링되도록 blob URL에 힌트 fragment를 붙인다
+    const finalUrl = isAudio ? withAudioHint(newUrl, name) : newUrl
+    setUrl(finalUrl)
     setFileName(name)
-    // 음원 파일 여부 판단
-    const audioExts = ['.mp3', '.aac', '.flac', '.wav', '.ogg', '.m4a']
-    const isAudio = audioExts.some(ext => newUrl.toLowerCase().includes(ext))
     setIsAudioOnly(isAudio)
     if (isAudio) setVideoCollapsed(true) // 음원이면 자동 접기
     setPlaying(true)
@@ -334,8 +464,9 @@ export default function App() {
     const file = e.target.files[0]
     if (!file) return
     const objectUrl = URL.createObjectURL(file)
-    loadUrl(objectUrl, file.name)
-    addToHistory(objectUrl, file.name)
+    const isAudio = isAudioFileName(file.name)
+    loadUrl(objectUrl, file.name, isAudio)
+    addToHistory(objectUrl, file.name, isAudio)
     e.target.value = ''
   }
 
@@ -343,10 +474,9 @@ export default function App() {
     e.preventDefault()
     const trimmed = urlInput.trim()
     if (!trimmed) return
-    setIsAudioOnly(false)
     setVideoCollapsed(false)
-    loadUrl(trimmed)
-    addToHistory(trimmed, 'YouTube 영상')
+    loadUrl(trimmed, '', false)
+    addToHistory(trimmed, 'YouTube 영상', false)
   }
 
   // ── 가사 패널 헬퍼 ──
@@ -480,12 +610,12 @@ export default function App() {
   const handlePause = () => setPlaying(false)
 
   // ── 시크바 ──
-  const handleSeekMouseDown = () => setSeeking(true)
-  const handleSeekChange    = (e) => setPlayed(parseFloat(e.target.value))
-  const handleSeekMouseUp   = (e) => {
+  const handleSeekStart  = () => setSeeking(true)
+  const handleSeekChange = (ratio) => setPlayed(ratio)
+  const handleSeekEnd    = (ratio) => {
     setSeeking(false)
     if (playerRef.current)
-      playerRef.current.currentTime = parseFloat(e.target.value) * duration
+      playerRef.current.currentTime = ratio * duration
   }
   const skip = (sec) => {
     if (!playerRef.current) return
@@ -684,20 +814,13 @@ export default function App() {
             {/* 시크바 */}
             <div className="flex items-center gap-3 text-xs font-mono" style={{ color: '#a78bfa' }}>
               <span className="w-11 text-right shrink-0">{formatTime(playedSeconds)}</span>
-              <div className="relative flex-1">
-                <input type="range" min={0} max={1} step={0.0001} value={played}
-                  onMouseDown={handleSeekMouseDown} onChange={handleSeekChange} onMouseUp={handleSeekMouseUp}
-                  className="w-full cursor-pointer"
-                />
-                {pointA !== null && duration > 0 && (
-                  <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
-                    style={{ left: `${(pointA / duration) * 100}%`, background: '#a78bfa' }} />
-                )}
-                {pointB !== null && duration > 0 && (
-                  <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-4 rounded-sm pointer-events-none"
-                    style={{ left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
-                )}
-              </div>
+              <SeekBar
+                played={played} duration={duration}
+                pointA={pointA} pointB={pointB}
+                onSeekStart={handleSeekStart}
+                onSeekChange={handleSeekChange}
+                onSeekEnd={handleSeekEnd}
+              />
               <span className="w-11 shrink-0">{formatTime(duration)}</span>
             </div>
 
