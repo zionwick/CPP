@@ -67,9 +67,8 @@ function withAudioHint(rawUrl, name = '') {
 
 // 재생시간에 맞춰 5초~1시간 사이 적당한 눈금 간격을 고른다
 const TICK_INTERVALS = [5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600]
-function pickTickInterval(duration) {
+function pickTickInterval(duration, maxTicks = 10) {
   if (!duration || duration <= 0) return 5
-  const maxTicks = 10
   for (const interval of TICK_INTERVALS) {
     if (duration / interval <= maxTicks) return interval
   }
@@ -192,7 +191,7 @@ function HelpModal({ onClose }) {
   )
 }
 
-function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, onSeekEnd }) {
+function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, onSeekEnd, compact = false }) {
   const trackRef      = useRef(null)
   const [dragging, setDragging]   = useState(false)
   const [dragRatio, setDragRatio] = useState(null)
@@ -230,11 +229,22 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
   }
 
   const displayRatio = dragging && dragRatio !== null ? dragRatio : played
-  const interval = pickTickInterval(duration)
+  // 모바일은 h:mm:ss 라벨이 넓어져 겹치기 쉬우므로 눈금 개수를 줄인다
+  const interval = pickTickInterval(duration, compact ? 5 : 10)
   const ticks = []
   if (duration > 0) {
     for (let t = 0; t <= duration + 0.001; t += interval) ticks.push(t)
   }
+
+  // 트랙 두께는 고정, 그 외 세로 여백은 compact(모바일)에서 축소
+  const trackH   = 12
+  const centerY  = compact ? 12 : 16
+  const tickTop  = compact ? 20 : 28
+  const abH      = compact ? 16 : 20
+  const posLineH = compact ? 7 : 10
+  const posTriB  = compact ? 5 : 6
+  const containerH = compact ? 36 : 44
+  const tickFont = compact ? 8 : 9
 
   return (
     <div
@@ -244,47 +254,47 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       className="relative flex-1 select-none"
-      style={{ height: '44px', touchAction: 'none', cursor: 'pointer' }}
+      style={{ height: `${containerH}px`, touchAction: 'none', cursor: 'pointer' }}
     >
       {/* 트랙 배경 (기존 4px의 3배 두께) */}
-      <div className="absolute left-0 right-0 top-4 -translate-y-1/2 rounded-full pointer-events-none"
-        style={{ height: '12px', background: '#2d2d3e' }} />
+      <div className="absolute left-0 right-0 -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ top: `${centerY}px`, height: `${trackH}px`, background: '#2d2d3e' }} />
       {/* 재생 진행 */}
-      <div className="absolute left-0 top-4 -translate-y-1/2 rounded-full pointer-events-none"
-        style={{ height: '12px', width: `${displayRatio * 100}%`, background: '#1DB954' }} />
+      <div className="absolute left-0 -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ top: `${centerY}px`, height: `${trackH}px`, width: `${displayRatio * 100}%`, background: '#1DB954' }} />
 
       {/* 시간 눈금 */}
       {ticks.map(t => (
-        <div key={t} className="absolute top-[28px] pointer-events-none"
-          style={{ left: `${(t / duration) * 100}%`, transform: 'translateX(-50%)', textAlign: 'center' }}>
+        <div key={t} className="absolute pointer-events-none"
+          style={{ top: `${tickTop}px`, left: `${(t / duration) * 100}%`, transform: 'translateX(-50%)', textAlign: 'center' }}>
           <div style={{ width: '1px', height: '4px', background: '#3d3d52', margin: '0 auto' }} />
-          <span style={{ fontSize: '9px', color: '#5a5a72', whiteSpace: 'nowrap' }}>{formatTime(t)}</span>
+          <span style={{ fontSize: `${tickFont}px`, color: '#5a5a72', whiteSpace: 'nowrap' }}>{formatTime(t)}</span>
         </div>
       ))}
 
       {/* A/B 구간 마커 */}
       {pointA !== null && duration > 0 && (
-        <div className="absolute top-4 -translate-y-1/2 w-1.5 h-5 rounded-sm pointer-events-none"
-          style={{ left: `${(pointA / duration) * 100}%`, background: '#a78bfa' }} />
+        <div className="absolute -translate-y-1/2 w-1.5 rounded-sm pointer-events-none"
+          style={{ top: `${centerY}px`, height: `${abH}px`, left: `${(pointA / duration) * 100}%`, background: '#a78bfa' }} />
       )}
       {pointB !== null && duration > 0 && (
-        <div className="absolute top-4 -translate-y-1/2 w-1.5 h-5 rounded-sm pointer-events-none"
-          style={{ left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
+        <div className="absolute -translate-y-1/2 w-1.5 rounded-sm pointer-events-none"
+          style={{ top: `${centerY}px`, height: `${abH}px`, left: `${(pointB / duration) * 100}%`, background: '#a78bfa', opacity: 0.6 }} />
       )}
 
       {/* 현재 위치 마커: ▽─│─△ (트랙 중앙을 향해 안쪽으로 수렴) */}
-      <div className="absolute top-4 flex flex-col items-center pointer-events-none"
-        style={{ left: `${displayRatio * 100}%`, transform: 'translate(-50%, -50%)' }}>
+      <div className="absolute flex flex-col items-center pointer-events-none"
+        style={{ top: `${centerY}px`, left: `${displayRatio * 100}%`, transform: 'translate(-50%, -50%)' }}>
         <div style={{
           width: 0, height: 0,
           borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-          borderTop: '6px solid #1DB954',
+          borderTop: `${posTriB}px solid #1DB954`,
         }} />
-        <div style={{ width: '2px', height: '10px', background: '#1DB954' }} />
+        <div style={{ width: '2px', height: `${posLineH}px`, background: '#1DB954' }} />
         <div style={{
           width: 0, height: 0,
           borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-          borderBottom: '6px solid #1DB954',
+          borderBottom: `${posTriB}px solid #1DB954`,
         }} />
       </div>
     </div>
@@ -811,11 +821,13 @@ export default function App() {
           </div>
 
           {/* 컨트롤 패널 */}
-          <div className={`px-4 py-3 flex flex-col overflow-y-auto ${viewMode === 'mobile' ? 'shrink-0 gap-3' : 'flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}`}
+          <div className={viewMode === 'mobile'
+            ? 'px-3 py-2 flex flex-col overflow-y-auto shrink-0 gap-1.5'
+            : 'px-4 py-3 flex flex-col overflow-y-auto flex-[1] min-h-0 gap-0 justify-between overflow-hidden'}
             style={{ background: '#16161d', borderTop: '1px solid #2d2d3e' }}>
 
             {/* 시크바 */}
-            <div className="flex items-center gap-3 text-xs font-mono" style={{ color: '#a78bfa' }}>
+            <div className="flex items-center gap-2 text-xs font-mono" style={{ color: '#a78bfa' }}>
               <span className="w-11 text-right shrink-0">{formatTime(playedSeconds)}</span>
               <SeekBar
                 played={played} duration={duration}
@@ -823,16 +835,17 @@ export default function App() {
                 onSeekStart={handleSeekStart}
                 onSeekChange={handleSeekChange}
                 onSeekEnd={handleSeekEnd}
+                compact={viewMode === 'mobile'}
               />
               <span className="w-11 shrink-0">{formatTime(duration)}</span>
             </div>
 
             {/* 재생 · 속도 · 스킵 · 볼륨 */}
-            <div className={`flex items-center flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-2 pb-0.5' : 'gap-3 flex-wrap'}`}>
+            <div className={`flex items-center flex-nowrap overflow-x-auto ${viewMode === 'mobile' ? 'gap-1.5' : 'gap-3 flex-wrap'}`}>
               {/* 재생/일시정지 */}
               <button
                 onClick={() => setPlaying(p => !p)} disabled={!url}
-                className="w-11 h-11 rounded-full flex items-center justify-center text-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ${viewMode === 'mobile' ? 'w-10 h-10 text-lg' : 'w-11 h-11 text-xl'}`}
                 style={{ background: '#1DB954', color: '#000000' }}
               >{playing ? '⏸' : '▶'}</button>
 
@@ -840,7 +853,7 @@ export default function App() {
               <button
                 onClick={() => setLoopAll(p => !p)} disabled={!url}
                 title="전체 반복"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all disabled:opacity-30 shrink-0"
+                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 shrink-0 ${viewMode === 'mobile' ? 'w-8 h-8 text-xs' : 'w-9 h-9 text-sm'}`}
                 style={{
                   background: loopAll ? 'rgba(29,185,84,0.18)' : '#1e1e28',
                   color: loopAll ? '#1DB954' : '#a78bfa',
@@ -863,10 +876,10 @@ export default function App() {
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="text-xs" style={{ color: '#a78bfa' }}>스킵</span>
                 <button onClick={() => skip(-skipSeconds)} disabled={!url}
-                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2.5 py-1'}`}
                   style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}>◀◀</button>
                 <button onClick={() => skip(skipSeconds)} disabled={!url}
-                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-3 min-h-[44px]' : 'px-2.5 py-1'}`}
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2.5 py-1'}`}
                   style={{ background: '#1e1e28', color: '#a78bfa', border: 'none', cursor: 'pointer' }}>▶▶</button>
                 <div className="flex gap-1 ml-1">
                   {SKIP_UNITS.map(u => (
@@ -884,20 +897,20 @@ export default function App() {
             </div>
 
             {/* A-B 반복 */}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-medium shrink-0" style={{ color: '#a78bfa' }}>🔂 구간 반복</span>
               <button onClick={handleSetA} disabled={!url}
-                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{ ...abBtn(pointA !== null), opacity: !url ? 0.3 : 1 }}>
                 ⬇ A {pointA !== null ? formatTime(pointA) : '시작'}
               </button>
               <button onClick={handleSetB} disabled={!url}
-                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{ ...abBtn(pointB !== null), opacity: !url ? 0.3 : 1 }}>
                 ⬆ B {pointB !== null ? formatTime(pointB) : '끝'}
               </button>
               <button onClick={handleToggleLoop} disabled={!canLoop}
-                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{
                   padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
                   border: 'none', cursor: canLoop ? 'pointer' : 'not-allowed',
@@ -908,7 +921,7 @@ export default function App() {
                 }}
               >{looping ? '🔁 반복 중' : '↩ 반복'}</button>
               <button onClick={handleClearAB} disabled={pointA === null && pointB === null}
-                className={viewMode === 'mobile' ? 'min-h-[44px]' : ''}
+                className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{
                   padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
                   border: 'none', cursor: 'pointer',
