@@ -658,21 +658,21 @@ export default function App() {
 
   // ── 스타일 헬퍼 ──
   const speedBtn = (active) => ({
-    padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    padding: viewMode === 'mobile' ? '4px 10px' : '3px 7px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
     border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
     color: active ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
     boxShadow: active ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
   })
   const skipUnitBtn = (active) => ({
-    padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    padding: viewMode === 'mobile' ? '4px 8px' : '3px 6px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
     border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
     color: active ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
     boxShadow: active ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
   })
   const abBtn = (active) => ({
-    padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+    padding: viewMode === 'mobile' ? '4px 12px' : '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
     fontFamily: 'monospace', border: 'none', cursor: 'pointer', transition: 'all 0.15s',
     background: active ? 'color-mix(in srgb, var(--cp-text-muted) 18%, transparent)' : 'var(--cp-panel-alt)',
     color: 'var(--cp-text-muted)',
@@ -843,8 +843,8 @@ export default function App() {
             )}
           </div>
 
-          {/* 컨트롤 패널 — 세 줄(시크바/재생·속도·스킵·볼륨/A-B)이 항상 다 보이도록 압축, 공간이 부족하면 스크롤 */}
-          <div className={`px-3 py-2 flex flex-col overflow-y-auto gap-1.5 ${viewMode === 'mobile' ? 'shrink-0' : 'flex-[1] min-h-0'}`}
+          {/* 컨트롤 패널 — 항상 내용물 높이만큼만 차지(shrink-0), 영상 영역(flex-[4] min-h-0)이 남는 공간을 흡수 */}
+          <div className="px-3 py-2 flex flex-col shrink-0 gap-1.5"
             style={{ background: 'var(--cp-panel)', borderTop: '1px solid var(--cp-border)' }}>
 
             {/* 시크바 */}
@@ -860,12 +860,12 @@ export default function App() {
               <span className="w-11 shrink-0">{formatTime(duration)}</span>
             </div>
 
-            {/* 재생 · 속도 · 스킵 · 볼륨 — 모바일은 한 줄 유지+가로 스크롤, 데스크톱은 자연스럽게 줄바꿈(가로 스크롤바 없음) */}
-            <div className={`flex items-center shrink-0 ${viewMode === 'mobile' ? 'flex-nowrap overflow-x-auto gap-1.5' : 'flex-wrap gap-2'}`}>
+            {/* 재생 · 속도 · 스킵 · 볼륨 — 모바일은 한 줄 유지+가로 스크롤, 데스크톱은 자연스럽게 줄바꿈(가로 스크롤바 없음) + 최대한 압축 */}
+            <div className={`flex items-center shrink-0 ${viewMode === 'mobile' ? 'flex-nowrap overflow-x-auto gap-1.5' : 'flex-wrap gap-1.5'}`}>
               {/* 재생/일시정지 */}
               <button
                 onClick={() => setPlaying(p => !p)} disabled={!url}
-                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ${viewMode === 'mobile' ? 'w-10 h-10 text-lg' : 'w-11 h-11 text-xl'}`}
+                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ${viewMode === 'mobile' ? 'w-10 h-10 text-lg' : 'w-9 h-9 text-lg'}`}
                 style={{ background: 'var(--cp-accent)', color: 'var(--cp-accent-text)' }}
               >{playing ? '⏸' : '▶'}</button>
 
@@ -873,7 +873,7 @@ export default function App() {
               <button
                 onClick={() => setLoopAll(p => !p)} disabled={!url}
                 title="전체 반복"
-                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 shrink-0 ${viewMode === 'mobile' ? 'w-8 h-8 text-xs' : 'w-9 h-9 text-sm'}`}
+                className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 shrink-0 ${viewMode === 'mobile' ? 'w-8 h-8 text-xs' : 'w-7 h-7 text-xs'}`}
                 style={{
                   background: loopAll ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
                   color: loopAll ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
@@ -896,10 +896,10 @@ export default function App() {
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>스킵</span>
                 <button onClick={() => skip(-skipSeconds)} disabled={!url}
-                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2.5 py-1'}`}
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2 py-0.5'}`}
                   style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: 'none', cursor: 'pointer' }}>◀◀</button>
                 <button onClick={() => skip(skipSeconds)} disabled={!url}
-                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2.5 py-1'}`}
+                  className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2 py-0.5'}`}
                   style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: 'none', cursor: 'pointer' }}>▶▶</button>
                 <div className="flex gap-1 ml-1">
                   {SKIP_UNITS.map(u => (
@@ -932,7 +932,7 @@ export default function App() {
               <button onClick={handleToggleLoop} disabled={!canLoop}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{
-                  padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
+                  padding: viewMode === 'mobile' ? '4px 12px' : '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
                   border: 'none', cursor: canLoop ? 'pointer' : 'not-allowed',
                   opacity: !canLoop ? 0.3 : 1,
                   background: looping ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
@@ -943,7 +943,7 @@ export default function App() {
               <button onClick={handleClearAB} disabled={pointA === null && pointB === null}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{
-                  padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
+                  padding: viewMode === 'mobile' ? '4px 10px' : '3px 8px', borderRadius: '6px', fontSize: '11px',
                   border: 'none', cursor: 'pointer',
                   background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)',
                   opacity: pointA === null && pointB === null ? 0.3 : 1,
