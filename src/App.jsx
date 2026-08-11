@@ -1003,6 +1003,7 @@ export default function App() {
               boxShadow: showSaveForm ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
             }}>💾 {t('lyrics.save')}</button>
             <div className="ml-auto flex items-center gap-2">
+              <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('panelType')}</span>
               {[{ key: 'A', label: 'A' }, { key: 'AB', label: 'A│B' }, { key: 'B', label: 'B' }].map(({ key, label }) => (
                 <button key={key} onClick={() => switchLyricsView(key)}
                   className="min-h-[44px] md:min-h-[28px]"

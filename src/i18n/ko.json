@@ -1,4 +1,5 @@
 {
+  "panelType": "패널 타입",
   "theme": {
     "dark": "다크",
     "warm": "웜",
