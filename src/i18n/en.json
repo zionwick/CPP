@@ -1,0 +1,77 @@
+{
+  "theme": {
+    "dark": "Dark",
+    "warm": "Warm",
+    "switchTheme": "Switch Theme"
+  },
+  "viewMode": {
+    "pc": "PC",
+    "mobile": "Mobile"
+  },
+  "header": {
+    "help": "How to Use"
+  },
+  "guide": {
+    "title": "How to Use CopyPractice Player",
+    "steps": {
+      "step1": "🎵 Paste a YouTube URL or select a local file",
+      "step2": "▶️ Play and find the section you want to practice",
+      "step3": "Ⓐ Set the loop start point with the A button",
+      "step4": "Ⓑ Set the loop end point with the B button → looping starts automatically",
+      "step5": "🐢 Slow down playback with the speed buttons (0.25x–1.0x)",
+      "step6": "📝 Enter lyrics in the panel and mark them with the highlighter"
+    },
+    "dontShowAgain": "Don't show again",
+    "confirm": "Confirm"
+  },
+  "media": {
+    "localFile": "Local File",
+    "youtubeUrlPlaceholder": "Paste YouTube URL...",
+    "play": "Play",
+    "history": "Video History",
+    "noHistory": "No history yet.",
+    "noMedia": "Upload a file or enter a YouTube URL",
+    "playingAudio": "🎵 Playing Audio",
+    "video": "🎬 Video",
+    "expand": "▼ Expand",
+    "collapse": "▲ Collapse",
+    "youtubeDefaultTitle": "YouTube Video"
+  },
+  "controls": {
+    "speed": "Speed",
+    "skip": "Skip",
+    "repeatAll": "Repeat All"
+  },
+  "loopSection": {
+    "label": "🔂 Loop Section",
+    "aStart": "A Start",
+    "bEnd": "B End",
+    "loop": "Loop",
+    "looping": "Looping"
+  },
+  "lyrics": {
+    "highlight": "Highlight",
+    "clearHighlight": "Clear",
+    "save": "Save",
+    "clear": "Clear",
+    "savedLyrics": "Saved Lyrics",
+    "noSavedLyrics": "No saved lyrics yet.",
+    "title": "Title",
+    "titlePlaceholder": "Enter a title for the lyrics...",
+    "cancel": "Cancel",
+    "untitled": "Untitled",
+    "panelA": "A Panel",
+    "panelB": "B Panel",
+    "panelHint": "Paste or type your lyrics here."
+  },
+  "history": {
+    "editTitle": "Double-click to edit title",
+    "edit": "Edit title",
+    "delete": "Delete"
+  },
+  "date": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{days} days ago"
+  }
+}

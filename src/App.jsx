@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import ReactPlayer from 'react-player'
+import { useLanguage } from './i18n/useLanguage.js'
 
 const SPEEDS     = [0.25, 0.5, 0.75, 1.0]
 const SKIP_UNITS = [1, 2, 3, 5, 10]
@@ -33,14 +34,14 @@ function formatTime(sec) {
   return `${m}:${s}`
 }
 
-function formatDate(ts) {
+function formatDate(ts, t, language) {
   if (!ts) return ''
   const diff = Date.now() - ts
   const days = Math.floor(diff / 86400000)
-  if (days === 0) return '오늘'
-  if (days === 1) return '어제'
-  if (days < 7)  return `${days}일 전`
-  return new Date(ts).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+  if (days === 0) return t('date.today')
+  if (days === 1) return t('date.yesterday')
+  if (days < 7)  return t('date.daysAgo', { days })
+  return new Date(ts).toLocaleDateString(language === 'en' ? 'en-US' : 'ko-KR', { month: 'short', day: 'numeric' })
 }
 
 function readStorage(key) {
@@ -84,6 +85,7 @@ function HistoryRow({
   entry, isActive, onLoad, onStartEdit, onRemove,
   isEditing, editVal, onEditChange, onEditBlur, onEditKeyDown,
 }) {
+  const { t, language } = useLanguage()
   return (
     <div
       onClick={onLoad}
@@ -106,35 +108,36 @@ function HistoryRow({
           style={{ background: 'var(--cp-panel-alt)', border: '1px solid var(--cp-accent)' }}
         />
       ) : (
-        <span onDoubleClick={onStartEdit} title="더블클릭으로 제목 편집"
+        <span onDoubleClick={onStartEdit} title={t('history.editTitle')}
           className="flex-1 min-w-0 text-sm truncate transition-colors"
           style={{ color: isActive ? 'var(--cp-text)' : 'var(--cp-text-muted)' }}>
           {entry.title}
         </span>
       )}
       <span className="text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--cp-text-muted)' }}>
-        {formatDate(entry.savedAt ?? entry.addedAt)}
+        {formatDate(entry.savedAt ?? entry.addedAt, t, language)}
       </span>
-      <button onClick={onStartEdit} title="제목 편집"
+      <button onClick={onStartEdit} title={t('history.edit')}
         className="opacity-0 group-hover:opacity-100 text-xs shrink-0 transition-opacity px-0.5 hover:text-[var(--cp-text)]"
         style={{ color: 'var(--cp-text-muted)' }}>✏️</button>
-      <button onClick={onRemove} title="삭제"
+      <button onClick={onRemove} title={t('history.delete')}
         className="opacity-0 group-hover:opacity-100 text-xs shrink-0 transition-opacity px-0.5 hover:text-red-400"
         style={{ color: 'var(--cp-text-muted)' }}>🗑</button>
     </div>
   )
 }
 
-const HELP_STEPS = [
-  { icon: '🎵', text: '유튜브 URL 붙여넣기 또는 로컬 파일 선택' },
-  { icon: '▶️', text: '재생 후 연습할 구간 찾기' },
-  { icon: '🅐', text: 'A 버튼으로 반복 시작점 지정' },
-  { icon: '🅑', text: 'B 버튼으로 반복 끝점 지정 → 자동 반복 시작' },
-  { icon: '🐢', text: '속도 버튼으로 느리게 조절 (0.25x ~ 1.0x)' },
-  { icon: '📝', text: '가사 패널에 가사 입력 후 형광펜으로 표시' },
+const HELP_STEP_KEYS = [
+  'guide.steps.step1',
+  'guide.steps.step2',
+  'guide.steps.step3',
+  'guide.steps.step4',
+  'guide.steps.step5',
+  'guide.steps.step6',
 ]
 
 function HelpModal({ onClose }) {
+  const { t } = useLanguage()
   const [dontShow, setDontShow] = useState(false)
   const handleClose = () => {
     if (dontShow) localStorage.setItem('cp-help-seen', '1')
@@ -155,13 +158,13 @@ function HelpModal({ onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
           <div>
             <div style={{ fontSize: '11px', letterSpacing: '0.2em', color: 'var(--cp-accent)', marginBottom: '4px', fontWeight: 600 }}>GUIDE</div>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--cp-text)' }}>CopyPractice Player 사용법</h2>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--cp-text)' }}>{t('guide.title')}</h2>
           </div>
           <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cp-text-muted)', fontSize: '20px', lineHeight: 1, padding: '2px 4px' }}>✕</button>
         </div>
         <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {HELP_STEPS.map(({ icon, text }, i) => (
-            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          {HELP_STEP_KEYS.map((key, i) => (
+            <li key={key} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <span style={{
                 minWidth: '28px', height: '28px', borderRadius: '50%',
                 background: 'color-mix(in srgb, var(--cp-accent) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--cp-accent) 30%, transparent)',
@@ -169,8 +172,7 @@ function HelpModal({ onClose }) {
                 fontSize: '11px', fontWeight: 700, color: 'var(--cp-accent)', flexShrink: 0,
               }}>{i + 1}</span>
               <div style={{ paddingTop: '4px' }}>
-                <span style={{ marginRight: '6px' }}>{icon}</span>
-                <span style={{ fontSize: '14px', color: 'var(--cp-text)', lineHeight: 1.5 }}>{text}</span>
+                <span style={{ fontSize: '14px', color: 'var(--cp-text)', lineHeight: 1.5 }}>{t(key)}</span>
               </div>
             </li>
           ))}
@@ -180,12 +182,12 @@ function HelpModal({ onClose }) {
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
             <input type="checkbox" checked={dontShow} onChange={e => setDontShow(e.target.checked)}
               style={{ accentColor: 'var(--cp-accent)', width: '14px', height: '14px', cursor: 'pointer' }} />
-            <span style={{ fontSize: '12px', color: 'var(--cp-text-muted)' }}>다시 보지 않기</span>
+            <span style={{ fontSize: '12px', color: 'var(--cp-text-muted)' }}>{t('guide.dontShowAgain')}</span>
           </label>
           <button onClick={handleClose} style={{
             padding: '8px 24px', borderRadius: '8px', border: 'none',
             background: 'var(--cp-accent)', color: 'var(--cp-accent-text)', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-          }}>확인</button>
+          }}>{t('guide.confirm')}</button>
         </div>
       </div>
     </div>
@@ -303,6 +305,7 @@ function SeekBar({ played, duration, pointA, pointB, onSeekStart, onSeekChange, 
 }
 
 export default function App() {
+  const { t, language, toggleLanguage } = useLanguage()
   const playerRef    = useRef(null)
   const fileInputRef = useRef(null)
   const lyricsRef    = useRef(null)
@@ -497,7 +500,7 @@ export default function App() {
     if (!trimmed) return
     setVideoCollapsed(false)
     loadUrl(trimmed, '', false)
-    addToHistory(trimmed, 'YouTube 영상', false)
+    addToHistory(trimmed, t('media.youtubeDefaultTitle'), false)
   }
 
   // ── 가사 패널 헬퍼 ──
@@ -508,7 +511,7 @@ export default function App() {
     const textContent = ref.current?.textContent?.trim()
     if (!textContent) return
     const content = ref.current.innerHTML
-    const title   = saveTitle.trim() || '제목 없음'
+    const title   = saveTitle.trim() || t('lyrics.untitled')
     const entry   = { id: crypto.randomUUID(), title, content, savedAt: Date.now() }
     persistLyricsLib([entry, ...lyricsLib])
     setActiveLyricsId(entry.id)
@@ -685,8 +688,8 @@ export default function App() {
       {/* ── Header ── */}
       <header className="shrink-0 flex items-center px-4 py-3" style={{ borderBottom: '1px solid var(--cp-border)' }}>
         <div className="flex-1 flex items-center gap-3">
-          <span style={{ fontSize: '11px', color: theme === 'dark' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>다크</span>
-          <button onClick={() => setTheme(t => t === 'dark' ? 'warm' : 'dark')} title="테마 전환" style={{
+          <span style={{ fontSize: '11px', color: theme === 'dark' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.dark')}</span>
+          <button onClick={() => setTheme(prev => prev === 'dark' ? 'warm' : 'dark')} title={t('theme.switchTheme')} style={{
             width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             background: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-border)',
             position: 'relative', transition: 'background 0.2s', flexShrink: 0,
@@ -698,20 +701,20 @@ export default function App() {
               background: 'var(--cp-text)', transition: 'left 0.2s',
             }} />
           </button>
-          <span style={{ fontSize: '11px', color: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>웜</span>
+          <span style={{ fontSize: '11px', color: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.warm')}</span>
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <span style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '0.3em', color: 'var(--cp-accent)', lineHeight: 1 }}>CPP</span>
           <span style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: 'var(--cp-text-muted)', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
-          <button onClick={() => setShowHelp(true)} title="사용법 보기" style={{
+          <button onClick={() => setShowHelp(true)} title={t('header.help')} style={{
             width: '28px', height: '28px', borderRadius: '50%',
             border: '1px solid var(--cp-border)', background: 'var(--cp-panel-alt)',
             color: 'var(--cp-text-muted)', fontSize: '13px', fontWeight: 700,
             cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>?</button>
-          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>PC</span>
+          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.pc')}</span>
           <button onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')} style={{
             width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             background: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-border)',
@@ -724,7 +727,13 @@ export default function App() {
               background: 'var(--cp-text)', transition: 'left 0.2s',
             }} />
           </button>
-          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>모바일</span>
+          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.mobile')}</span>
+          <VDivider />
+          <button onClick={toggleLanguage} title={language === 'ko' ? 'Switch to English' : '한국어로 전환'} style={{
+            padding: '3px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 700,
+            border: '1px solid var(--cp-border)', background: 'var(--cp-panel-alt)',
+            color: 'var(--cp-accent)', cursor: 'pointer', letterSpacing: '0.05em',
+          }}>{language === 'ko' ? 'KO' : 'EN'}</button>
         </div>
       </header>
 
@@ -745,7 +754,7 @@ export default function App() {
             <button onClick={() => fileInputRef.current?.click()}
               className={`flex items-center gap-1 rounded-lg transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
               style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: '1px solid var(--cp-border)' }}>
-              📂{viewMode !== 'mobile' && <span>로컬 파일</span>}
+              📂{viewMode !== 'mobile' && <span>{t('media.localFile')}</span>}
             </button>
             <input ref={fileInputRef} type="file" accept="video/*,audio/*" className="hidden" onChange={handleFileChange} />
             {fileName && (
@@ -753,14 +762,14 @@ export default function App() {
             )}
             <form onSubmit={handleYouTubeSubmit} className="flex gap-1.5 flex-1 min-w-0">
               <input type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
-                placeholder={viewMode === 'mobile' ? 'YouTube URL...' : 'YouTube URL 붙여넣기...'}
+                placeholder={viewMode === 'mobile' ? 'YouTube URL...' : t('media.youtubeUrlPlaceholder')}
                 className={`flex-1 min-w-0 rounded-lg focus:outline-none transition-colors ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-3 py-2 text-sm'}`}
                 style={{ background: 'var(--cp-panel-alt)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
               />
               <button type="submit"
                 className={`flex items-center gap-1 rounded-lg font-medium transition-colors shrink-0 ${viewMode === 'mobile' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'}`}
                 style={{ background: 'var(--cp-accent)', color: 'var(--cp-accent-text)' }}>
-                ▶{viewMode !== 'mobile' && ' 재생'}
+                ▶{viewMode !== 'mobile' && ` ${t('media.play')}`}
               </button>
             </form>
           </div>
@@ -770,7 +779,7 @@ export default function App() {
             <button onClick={() => setShowHistory(p => !p)}
               className="w-full flex items-center gap-2 px-4 py-2 text-left transition-colors"
               style={{ color: 'var(--cp-text-muted)' }}>
-              <span className="text-xs font-medium">🕐 영상 기록</span>
+              <span className="text-xs font-medium">🕐 {t('media.history')}</span>
               {history.length > 0 && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)' }}>
                   {history.length}
@@ -781,7 +790,7 @@ export default function App() {
             {showHistory && (
               <div className="max-h-44 overflow-y-auto">
                 {history.length === 0
-                  ? <p className="px-4 py-3 text-xs" style={{ color: 'var(--cp-border)' }}>아직 기록이 없습니다.</p>
+                  ? <p className="px-4 py-3 text-xs" style={{ color: 'var(--cp-border)' }}>{t('media.noHistory')}</p>
                   : history.map(entry => (
                     <HistoryRow key={entry.id} entry={entry}
                       isActive={activeVideoId === entry.id}
@@ -810,8 +819,8 @@ export default function App() {
               className="w-full flex items-center justify-between px-4 py-1.5 text-xs"
               style={{ background: 'var(--cp-panel)', color: 'var(--cp-text-muted)', borderBottom: '1px solid var(--cp-border)', border: 'none', cursor: 'pointer' }}
             >
-              <span>{isAudioOnly ? '🎵 음원 재생 중' : '🎬 영상'}</span>
-              <span>{videoCollapsed ? '▼ 펼치기' : '▲ 접기'}</span>
+              <span>{isAudioOnly ? t('media.playingAudio') : t('media.video')}</span>
+              <span>{videoCollapsed ? t('media.expand') : t('media.collapse')}</span>
             </button>
           )}
 
@@ -838,7 +847,7 @@ export default function App() {
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ color: 'var(--cp-border)' }}>
                 <span className="text-5xl">♪</span>
-                <p className="text-sm" style={{ color: 'var(--cp-text-muted)' }}>파일 업로드 또는 YouTube URL 입력</p>
+                <p className="text-sm" style={{ color: 'var(--cp-text-muted)' }}>{t('media.noMedia')}</p>
               </div>
             )}
           </div>
@@ -872,7 +881,7 @@ export default function App() {
               {/* 전체 반복 버튼 */}
               <button
                 onClick={() => setLoopAll(p => !p)} disabled={!url}
-                title="전체 반복"
+                title={t('controls.repeatAll')}
                 className={`rounded-full flex items-center justify-center transition-all disabled:opacity-30 shrink-0 ${viewMode === 'mobile' ? 'w-8 h-8 text-xs' : 'w-7 h-7 text-xs'}`}
                 style={{
                   background: loopAll ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
@@ -885,7 +894,7 @@ export default function App() {
               <VDivider />
 
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>속도</span>
+                <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('controls.speed')}</span>
                 {SPEEDS.map(s => (
                   <button key={s} onClick={() => setSpeed(s)} style={speedBtn(speed === s)}>{s}x</button>
                 ))}
@@ -894,7 +903,7 @@ export default function App() {
               <VDivider />
 
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>스킵</span>
+                <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('controls.skip')}</span>
                 <button onClick={() => skip(-skipSeconds)} disabled={!url}
                   className={`rounded text-sm transition-colors disabled:opacity-30 ${viewMode === 'mobile' ? 'px-2.5 min-h-[38px]' : 'px-2 py-0.5'}`}
                   style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: 'none', cursor: 'pointer' }}>◀◀</button>
@@ -918,16 +927,16 @@ export default function App() {
 
             {/* A-B 반복 — 모바일은 한 줄 유지+가로 스크롤, 데스크톱은 자연스럽게 줄바꿈(가로 스크롤바 없음) */}
             <div className={`flex items-center gap-1.5 shrink-0 ${viewMode === 'mobile' ? 'flex-nowrap overflow-x-auto' : 'flex-wrap'}`}>
-              <span className="text-xs font-medium shrink-0" style={{ color: 'var(--cp-text-muted)' }}>🔂 구간 반복</span>
+              <span className="text-xs font-medium shrink-0" style={{ color: 'var(--cp-text-muted)' }}>{t('loopSection.label')}</span>
               <button onClick={handleSetA} disabled={!url}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{ ...abBtn(pointA !== null), opacity: !url ? 0.3 : 1 }}>
-                ⬇ A {pointA !== null ? formatTime(pointA) : '시작'}
+                ⬇ {pointA !== null ? `A ${formatTime(pointA)}` : t('loopSection.aStart')}
               </button>
               <button onClick={handleSetB} disabled={!url}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{ ...abBtn(pointB !== null), opacity: !url ? 0.3 : 1 }}>
-                ⬆ B {pointB !== null ? formatTime(pointB) : '끝'}
+                ⬆ {pointB !== null ? `B ${formatTime(pointB)}` : t('loopSection.bEnd')}
               </button>
               <button onClick={handleToggleLoop} disabled={!canLoop}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
@@ -939,7 +948,7 @@ export default function App() {
                   color: looping ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
                   boxShadow: looping ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
                 }}
-              >{looping ? '🔁 반복 중' : '↩ 반복'}</button>
+              >{looping ? `🔁 ${t('loopSection.looping')}` : `↩ ${t('loopSection.loop')}`}</button>
               <button onClick={handleClearAB} disabled={pointA === null && pointB === null}
                 className={viewMode === 'mobile' ? 'min-h-[38px]' : ''}
                 style={{
@@ -971,7 +980,7 @@ export default function App() {
             </div>
             <VDivider />
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>형광</span>
+              <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('lyrics.highlight')}</span>
               {HIGHLIGHTS.map(({ color, bg }) => (
                 <button key={color}
                   onMouseDown={e => { e.preventDefault(); setActiveHighlight(color); applyHighlight(color) }}
@@ -983,7 +992,7 @@ export default function App() {
                 padding: '2px 8px', borderRadius: '5px', fontSize: '11px',
                 border: '1px solid var(--cp-border)', cursor: 'pointer',
                 background: 'transparent', color: 'var(--cp-text-muted)',
-              }}>제거</button>
+              }}>{t('lyrics.clearHighlight')}</button>
             </div>
             <VDivider />
             <button onClick={() => { setShowSaveForm(p => !p); setSaveTitle('') }} style={{
@@ -992,7 +1001,7 @@ export default function App() {
               background: showSaveForm ? 'color-mix(in srgb, var(--cp-accent) 18%, transparent)' : 'var(--cp-panel-alt)',
               color: showSaveForm ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
               boxShadow: showSaveForm ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
-            }}>💾 저장</button>
+            }}>💾 {t('lyrics.save')}</button>
             <div className="ml-auto flex items-center gap-2">
               {[{ key: 'A', label: 'A' }, { key: 'AB', label: 'A│B' }, { key: 'B', label: 'B' }].map(({ key, label }) => (
                 <button key={key} onClick={() => switchLyricsView(key)}
@@ -1008,7 +1017,7 @@ export default function App() {
               <div style={{ width: '1px', height: '16px', background: 'var(--cp-border)', flexShrink: 0 }} />
               <button onClick={clearLyrics} style={{
                 fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cp-text-muted)',
-              }}>지우기</button>
+              }}>{t('lyrics.clear')}</button>
             </div>
           </div>
 
@@ -1016,22 +1025,22 @@ export default function App() {
           {showSaveForm && (
             <div className="shrink-0 flex items-center gap-2 px-4 py-2.5"
               style={{ background: 'var(--cp-panel)', borderBottom: '1px solid var(--cp-border)' }}>
-              <span className="text-xs shrink-0" style={{ color: 'var(--cp-text-muted)' }}>제목</span>
+              <span className="text-xs shrink-0" style={{ color: 'var(--cp-text-muted)' }}>{t('lyrics.title')}</span>
               <input autoFocus value={saveTitle} onChange={e => setSaveTitle(e.target.value)}
                 onKeyDown={e => {
                   if (e.key === 'Enter') handleSaveLyrics()
                   if (e.key === 'Escape') setShowSaveForm(false)
                 }}
-                placeholder="가사 제목을 입력하세요..."
+                placeholder={t('lyrics.titlePlaceholder')}
                 className="flex-1 px-3 py-1.5 rounded text-sm focus:outline-none"
                 style={{ background: 'var(--cp-panel-alt)', border: '1px solid var(--cp-border)', color: 'var(--cp-text)' }}
               />
               <button onClick={handleSaveLyrics}
                 className="px-3 py-1.5 rounded text-sm font-medium shrink-0"
-                style={{ background: 'var(--cp-accent)', color: 'var(--cp-accent-text)', border: 'none', cursor: 'pointer' }}>저장</button>
+                style={{ background: 'var(--cp-accent)', color: 'var(--cp-accent-text)', border: 'none', cursor: 'pointer' }}>{t('lyrics.save')}</button>
               <button onClick={() => setShowSaveForm(false)}
                 className="px-3 py-1.5 rounded text-sm shrink-0"
-                style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: 'none', cursor: 'pointer' }}>취소</button>
+                style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)', border: 'none', cursor: 'pointer' }}>{t('lyrics.cancel')}</button>
             </div>
           )}
 
@@ -1040,7 +1049,7 @@ export default function App() {
             <button onClick={() => setShowLyricsLib(p => !p)}
               className="w-full flex items-center gap-2 px-4 py-2 text-left"
               style={{ color: 'var(--cp-text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-              <span className="text-xs font-medium">📚 저장된 가사</span>
+              <span className="text-xs font-medium">📚 {t('lyrics.savedLyrics')}</span>
               {lyricsLib.length > 0 && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: 'var(--cp-panel-alt)', color: 'var(--cp-text-muted)' }}>
                   {lyricsLib.length}
@@ -1051,7 +1060,7 @@ export default function App() {
             {showLyricsLib && (
               <div className="max-h-44 overflow-y-auto">
                 {lyricsLib.length === 0
-                  ? <p className="px-4 py-3 text-xs" style={{ color: 'var(--cp-border)' }}>저장된 가사가 없습니다.</p>
+                  ? <p className="px-4 py-3 text-xs" style={{ color: 'var(--cp-border)' }}>{t('lyrics.noSavedLyrics')}</p>
                   : lyricsLib.map(entry => (
                     <HistoryRow key={entry.id} entry={entry}
                       isActive={activeLyricsId === entry.id}
@@ -1077,7 +1086,7 @@ export default function App() {
           <div className={viewMode === 'mobile' ? 'flex' : 'flex-1 flex overflow-hidden'}>
             <div ref={lyricsRef} contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(1)}
-              data-placeholder={'A 패널\n\n가사를 붙여넣거나 직접 입력하세요.'}
+              data-placeholder={`${t('lyrics.panelA')}\n\n${t('lyrics.panelHint')}`}
               style={{
                 display: lyricsView === 'B' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,
@@ -1089,7 +1098,7 @@ export default function App() {
             />
             <div ref={lyricsRef2} contentEditable suppressContentEditableWarning spellCheck={false}
               onFocus={() => setActivePanel(2)}
-              data-placeholder={'B 패널\n\n가사를 붙여넣거나 직접 입력하세요.'}
+              data-placeholder={`${t('lyrics.panelB')}\n\n${t('lyrics.panelHint')}`}
               style={{
                 display: lyricsView === 'A' ? 'none' : 'block',
                 fontSize: `${fontSize}px`,

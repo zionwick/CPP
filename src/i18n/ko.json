@@ -1,0 +1,77 @@
+{
+  "theme": {
+    "dark": "다크",
+    "warm": "웜",
+    "switchTheme": "테마 전환"
+  },
+  "viewMode": {
+    "pc": "PC",
+    "mobile": "모바일"
+  },
+  "header": {
+    "help": "사용법 보기"
+  },
+  "guide": {
+    "title": "CopyPractice Player 사용법",
+    "steps": {
+      "step1": "🎵 유튜브 URL 붙여넣기 또는 로컬 파일 선택",
+      "step2": "▶️ 재생 후 연습할 구간 찾기",
+      "step3": "Ⓐ A 버튼으로 반복 시작점 지정",
+      "step4": "Ⓑ B 버튼으로 반복 끝점 지정 → 자동 반복 시작",
+      "step5": "🐢 속도 버튼으로 느리게 조절 (0.25x ~ 1.0x)",
+      "step6": "📝 가사 패널에 가사 입력 후 형광펜으로 표시"
+    },
+    "dontShowAgain": "다시 보지 않기",
+    "confirm": "확인"
+  },
+  "media": {
+    "localFile": "로컬 파일",
+    "youtubeUrlPlaceholder": "YouTube URL 붙여넣기...",
+    "play": "재생",
+    "history": "영상 기록",
+    "noHistory": "아직 기록이 없습니다.",
+    "noMedia": "파일 업로드 또는 YouTube URL 입력",
+    "playingAudio": "🎵 음원 재생 중",
+    "video": "🎬 영상",
+    "expand": "▼ 펼치기",
+    "collapse": "▲ 접기",
+    "youtubeDefaultTitle": "YouTube 영상"
+  },
+  "controls": {
+    "speed": "속도",
+    "skip": "스킵",
+    "repeatAll": "전체 반복"
+  },
+  "loopSection": {
+    "label": "🔂 구간 반복",
+    "aStart": "A 시작",
+    "bEnd": "B 끝",
+    "loop": "반복",
+    "looping": "반복 중"
+  },
+  "lyrics": {
+    "highlight": "형광",
+    "clearHighlight": "제거",
+    "save": "저장",
+    "clear": "지우기",
+    "savedLyrics": "저장된 가사",
+    "noSavedLyrics": "저장된 가사가 없습니다.",
+    "title": "제목",
+    "titlePlaceholder": "가사 제목을 입력하세요...",
+    "cancel": "취소",
+    "untitled": "제목 없음",
+    "panelA": "A 패널",
+    "panelB": "B 패널",
+    "panelHint": "가사를 붙여넣거나 직접 입력하세요."
+  },
+  "history": {
+    "editTitle": "더블클릭으로 제목 편집",
+    "edit": "제목 편집",
+    "delete": "삭제"
+  },
+  "date": {
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgo": "{days}일 전"
+  }
+}
