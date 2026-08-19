@@ -177,6 +177,13 @@ function HelpModal({ onClose }) {
             </li>
           ))}
         </ol>
+
+        {/* SEO용 소개 문단 — GUIDE 팝업은 첫 방문 시 기본 노출되어 크롤러도 함께 읽을 수 있음 */}
+        <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--cp-text-muted)', margin: '18px 0 0' }}>
+          CopyPractice Player는 유튜브 영상이나 로컬 파일을 이용해 원하는 구간을 무한 반복하며 속도를 늦춰 연습할 수 있는 무료 웹 기반 연습 도구입니다.
+          보컬과 악기 연습을 위한 구간 반복(A-B 루프), 배속 조절, 가사 동기화 기능을 하나의 화면에서 제공합니다.
+        </p>
+
         <div style={{ height: '1px', background: 'color-mix(in srgb, var(--cp-text) 6%, transparent)', margin: '20px 0' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -684,6 +691,9 @@ export default function App() {
 
   return (
     <div style={{ background: 'var(--cp-bg)' }} className="h-screen text-[var(--cp-text)] flex flex-col overflow-hidden">
+
+      {/* SEO용 숨김 제목 — 시각적으로는 노출하지 않되 검색엔진/스크린리더에는 페이지 정체성을 전달 */}
+      <h1 className="sr-only">CopyPractice Player - 유튜브 구간 반복 연습, 속도 조절, 가사 동기화 보컬·악기 연습 앱</h1>
 
       {/* ── Header ── */}
       <header className="shrink-0 flex items-center px-4 py-3" style={{ borderBottom: '1px solid var(--cp-border)' }}>
