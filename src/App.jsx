@@ -48,6 +48,10 @@ function readStorage(key) {
   try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] }
 }
 
+// 빌드 타임 프리렌더(SSR)는 window/localStorage가 없는 Node 환경에서 실행되므로,
+// 초기 렌더에서 이를 직접 참조하는 곳은 안전한 기본값으로 분기해야 한다.
+const isBrowser = typeof window !== 'undefined'
+
 // ── 오디오 파일 판별 & react-player <audio> 강제 렌더링 ──
 const AUDIO_EXT_RE = /\.(mp3|aac|flac|wav|ogg|m4a)$/i
 // react-player의 내부 AUDIO_EXTENSIONS 정규식에 없는 확장자는 인식되는 확장자로 대체 힌트를 준다
@@ -345,7 +349,7 @@ export default function App() {
 
   // ── 영상 기록 ──
   const [history, setHistory]             = useState(() => readStorage(HISTORY_KEY))
-  const [showHistory, setShowHistory]     = useState(() => window.innerWidth >= 768)
+  const [showHistory, setShowHistory]     = useState(() => !isBrowser || window.innerWidth >= 768)
   const [activeVideoId, setActiveVideoId] = useState(null)
   const [editVideoId, setEditVideoId]     = useState(null)
   const [editVideoTitle, setEditVideoTitle] = useState('')
@@ -361,12 +365,12 @@ export default function App() {
   const [editLyricsId, setEditLyricsId]     = useState(null)
   const [editLyricsTitle, setEditLyricsTitle] = useState('')
   const [activePanel, setActivePanel]       = useState(1)
-  const [viewMode, setViewMode]             = useState(() => window.innerWidth < 768 ? 'mobile' : 'desktop')
-  const [lyricsView, setLyricsView]         = useState(() => window.innerWidth < 768 ? 'A' : 'AB')
-  const [showHelp, setShowHelp]             = useState(() => !localStorage.getItem('cp-help-seen'))
+  const [viewMode, setViewMode]             = useState(() => (isBrowser && window.innerWidth < 768) ? 'mobile' : 'desktop')
+  const [lyricsView, setLyricsView]         = useState(() => (isBrowser && window.innerWidth < 768) ? 'A' : 'AB')
+  const [showHelp, setShowHelp]             = useState(() => isBrowser ? !localStorage.getItem('cp-help-seen') : true)
 
   // ── 테마 (다크 / 웜) ──
-  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'dark')
+  const [theme, setTheme] = useState(() => isBrowser ? (localStorage.getItem(THEME_KEY) || 'dark') : 'dark')
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem(THEME_KEY, theme)

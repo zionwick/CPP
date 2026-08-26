@@ -16,7 +16,8 @@ function interpolate(str, params) {
 }
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem(LANGUAGE_KEY) || 'ko')
+  // 빌드 타임 프리렌더(SSR)는 localStorage가 없는 Node 환경에서 실행되므로 기본값(ko)으로 분기
+  const [language, setLanguage] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem(LANGUAGE_KEY) : null) || 'ko')
 
   useEffect(() => {
     localStorage.setItem(LANGUAGE_KEY, language)
