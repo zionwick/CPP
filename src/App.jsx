@@ -685,6 +685,10 @@ export default function App() {
     color: active ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
     boxShadow: active ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
   })
+  const footerLink = {
+    color: 'var(--cp-text-muted)', textDecoration: 'underline',
+    textUnderlineOffset: '2px', whiteSpace: 'nowrap',
+  }
   const abBtn = (active) => ({
     padding: viewMode === 'mobile' ? '4px 12px' : '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
     fontFamily: 'monospace', border: 'none', cursor: 'pointer', transition: 'all 0.15s',
@@ -1125,6 +1129,15 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* ── Footer — 기능 소개 페이지로 가는 내부 링크 (프리렌더된 정적 HTML에도 함께 들어간다) ── */}
+      <footer className="shrink-0 flex items-center justify-center gap-x-4 gap-y-1 px-4 py-1.5 flex-wrap"
+        style={{ borderTop: '1px solid var(--cp-border)', fontSize: '11px', color: 'var(--cp-text-muted)' }}>
+        <span style={{ opacity: 0.65 }}>{t('footer.guides')}</span>
+        <a href="/youtube-loop" style={footerLink}>{t('footer.youtubeLoop')}</a>
+        <a href="/slow-down" style={footerLink}>{t('footer.slowDown')}</a>
+        <a href="/lyrics-practice" style={footerLink}>{t('footer.lyricsPractice')}</a>
+      </footer>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </div>

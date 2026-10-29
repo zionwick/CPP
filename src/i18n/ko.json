@@ -74,5 +74,11 @@
     "today": "오늘",
     "yesterday": "어제",
     "daysAgo": "{days}일 전"
+  },
+  "footer": {
+    "guides": "기능 가이드",
+    "youtubeLoop": "유튜브 구간 반복",
+    "slowDown": "속도 조절 연습",
+    "lyricsPractice": "가사 연습"
   }
 }

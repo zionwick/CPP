@@ -74,5 +74,11 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "{days} days ago"
+  },
+  "footer": {
+    "guides": "Guides",
+    "youtubeLoop": "A-B Loop",
+    "slowDown": "Speed Control",
+    "lyricsPractice": "Lyrics Practice"
   }
 }
