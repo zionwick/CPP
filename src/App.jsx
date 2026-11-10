@@ -1138,6 +1138,9 @@ export default function App() {
         <a href="/youtube-loop/" style={footerLink}>{t('footer.youtubeLoop')}</a>
         <a href="/slow-down/" style={footerLink}>{t('footer.slowDown')}</a>
         <a href="/lyrics-practice/" style={footerLink}>{t('footer.lyricsPractice')}</a>
+        <span aria-hidden="true" style={{ opacity: 0.4 }}>|</span>
+        <a href="/privacy/" style={footerLink}>{t('footer.privacy')}</a>
+        <a href="mailto:zocl888@gmail.com" style={footerLink}>{t('footer.contact')}</a>
       </footer>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}

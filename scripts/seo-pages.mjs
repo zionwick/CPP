@@ -362,6 +362,7 @@ ${renderFaqJsonLd(page)}
       <nav aria-label="관련 페이지">
         ${relatedLinks}
       </nav>
+      ${renderFooterExtra()}
       <p><a href="/">CopyPractice Player로 돌아가기</a></p>
     </footer>
   </body>
@@ -395,4 +396,129 @@ export function renderSitemap(buildDate) {
 ${urls}
 </urlset>
 `
+}
+
+// ── 개인정보처리방침 (/privacy/) ──
+// 기능 소개 페이지와 같은 정적 HTML이지만 FAQ·검색용 요건이 없어 별도로 렌더링한다.
+export const CONTACT_EMAIL = 'zocl888@gmail.com'
+export const PRIVACY_EFFECTIVE_DATE = '2026년 11월 10일'
+
+const PRIVACY_SECTIONS = [
+  {
+    h2: '1. 수집하는 개인정보',
+    paragraphs: [
+      'CopyPractice Player(이하 “서비스”)는 회원가입이나 로그인 없이 이용할 수 있으며, 이름·이메일·전화번호 등 이용자를 식별할 수 있는 개인정보를 수집하거나 서버에 저장하지 않습니다.',
+      '이용자가 불러온 음원·영상 파일, 입력한 가사와 메모는 서버로 전송되지 않고 이용자의 브라우저 안에서만 처리됩니다.',
+    ],
+  },
+  {
+    h2: '2. 브라우저에 저장되는 정보',
+    paragraphs: [
+      '편의 기능을 위해 다음 정보가 이용자 기기의 브라우저 저장소(localStorage)에만 보관됩니다. 이 정보는 서비스 운영자에게 전송되지 않으며, 다른 기기에서는 보이지 않습니다.',
+    ],
+    list: [
+      '최근에 연 영상 기록(영상 주소와 제목)',
+      '저장한 가사와 형광펜 표시',
+      '화면 테마, 언어 설정, 도움말 표시 여부',
+    ],
+    after: [
+      '브라우저의 사이트 데이터를 삭제하면 위 정보도 함께 삭제됩니다.',
+    ],
+  },
+  {
+    h2: '3. 방문 통계',
+    paragraphs: [
+      '서비스는 사이트 이용 현황을 파악하기 위해 Cloudflare Web Analytics를 사용합니다. 이 도구는 쿠키를 사용하지 않으며, 방문 수·국가·브라우저 종류 같은 집계 통계만 제공하고 개별 이용자를 식별하거나 추적하지 않습니다.',
+    ],
+  },
+  {
+    h2: '4. YouTube 영상 재생',
+    paragraphs: [
+      '서비스는 YouTube 영상을 재생하기 위해 YouTube API 서비스를 사용합니다. 이용자가 YouTube 영상을 재생하면 YouTube(Google)가 자체 정책에 따라 쿠키를 사용하거나 정보를 수집할 수 있습니다. 이 정보는 서비스 운영자가 아닌 Google이 처리합니다.',
+    ],
+    links: [
+      ['YouTube 서비스 약관', 'https://www.youtube.com/t/terms'],
+      ['Google 개인정보처리방침', 'https://policies.google.com/privacy'],
+    ],
+  },
+  {
+    h2: '5. 제3자 제공',
+    paragraphs: [
+      '서비스는 개인정보를 수집하지 않으므로 제3자에게 제공하는 개인정보가 없습니다.',
+    ],
+  },
+  {
+    h2: '6. 문의',
+    paragraphs: [
+      '개인정보 처리와 관련한 문의, 서비스 이용 중 불편 사항이나 의견은 아래 이메일로 보내 주세요.',
+    ],
+    email: true,
+  },
+  {
+    h2: '7. 방침의 변경',
+    paragraphs: [
+      '이 방침이 변경되는 경우 이 페이지를 통해 알립니다.',
+    ],
+  },
+]
+
+export function renderPrivacyHtml() {
+  const url = `${SITE_ORIGIN}/privacy/`
+  const body = PRIVACY_SECTIONS.map((s) => {
+    const parts = [`<h2>${esc(s.h2)}</h2>`]
+    for (const p of s.paragraphs || []) parts.push(`<p>${esc(p)}</p>`)
+    if (s.list) {
+      parts.push('<ul>')
+      for (const li of s.list) parts.push(`<li>${esc(li)}</li>`)
+      parts.push('</ul>')
+    }
+    for (const p of s.after || []) parts.push(`<p>${esc(p)}</p>`)
+    if (s.links) {
+      parts.push('<ul>')
+      for (const [label, href] of s.links) parts.push(`<li><a href="${href}" rel="noopener" target="_blank">${esc(label)}</a></li>`)
+      parts.push('</ul>')
+    }
+    if (s.email) parts.push(`<p>운영: ZOCLAB<br />이메일: <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></p>`)
+    return parts.join('\n      ')
+  }).join('\n\n      ')
+
+  return `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>개인정보처리방침 | CopyPractice Player</title>
+    <meta name="description" content="CopyPractice Player는 회원가입 없이 이용하며 개인정보를 서버에 수집·저장하지 않습니다. 브라우저 저장 정보, 방문 통계, YouTube 재생 관련 안내입니다." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="${url}" />
+    <meta name="theme-color" content="#0f0f13" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <style>${PAGE_CSS}ul{padding-left:22px;margin:0 0 16px}ul li{margin-bottom:6px}</style>
+  </head>
+  <body>
+    <div class="bar">
+      <a class="brand" href="/">CPP</a>
+      <a class="cta" href="/">지금 바로 사용하기</a>
+    </div>
+
+    <main>
+      <h1>개인정보처리방침</h1>
+      <p class="lead">시행일: ${PRIVACY_EFFECTIVE_DATE}</p>
+
+      ${body}
+    </main>
+
+    <footer>
+      ${renderFooterExtra()}
+      <p><a href="/">CopyPractice Player로 돌아가기</a></p>
+    </footer>
+  </body>
+</html>
+`
+}
+
+// 모든 정적 페이지 하단에 들어가는 개인정보처리방침·문의 링크
+export function renderFooterExtra() {
+  return `<nav aria-label="사이트 정보"><a href="/privacy/">개인정보처리방침</a><a href="mailto:${CONTACT_EMAIL}">문의 ${CONTACT_EMAIL}</a></nav>`
 }

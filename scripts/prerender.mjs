@@ -12,7 +12,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { PAGES, renderPageHtml, renderSitemap } from './seo-pages.mjs'
+import { PAGES, renderPageHtml, renderSitemap, renderPrivacyHtml, CONTACT_EMAIL } from './seo-pages.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = path.join(root, 'dist')
@@ -111,6 +111,17 @@ for (const page of PAGES) {
   )
 }
 
+// ── 2-1) 개인정보처리방침 ──
+{
+  const outDir = path.join(distDir, 'privacy')
+  fs.mkdirSync(outDir, { recursive: true })
+  fs.writeFileSync(path.join(outDir, 'index.html'), renderPrivacyHtml())
+  const written = fs.readFileSync(path.join(outDir, 'index.html'), 'utf-8')
+  if (!written.includes(`mailto:${CONTACT_EMAIL}`)) problems.push('/privacy: 문의 이메일이 없습니다.')
+  if (!written.includes('<link rel="canonical" href="https://cpplay.org/privacy/" />')) problems.push('/privacy: canonical이 없습니다.')
+  console.log('[prerender] dist/privacy/index.html 생성')
+}
+
 // ── 3) sitemap.xml (lastmod = 빌드 날짜) ──
 const buildDate = new Date().toISOString().slice(0, 10)
 const sitemapPath = path.join(distDir, 'sitemap.xml')
@@ -129,6 +140,10 @@ for (const page of PAGES) {
   if (!mainHtml.includes(`href="/${page.slug}/"`)) {
     problems.push(`메인 페이지(dist/index.html)에 /${page.slug} 링크가 없습니다.`)
   }
+}
+
+for (const needle of ['href="/privacy/"', `mailto:${CONTACT_EMAIL}`]) {
+  if (!mainHtml.includes(needle)) problems.push(`메인 페이지에 ${needle} 링크가 없습니다.`)
 }
 
 if (problems.length > 0) {
