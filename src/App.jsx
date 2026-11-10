@@ -1134,10 +1134,10 @@ export default function App() {
       <footer className="shrink-0 flex items-center justify-center gap-x-4 gap-y-1 px-4 py-1.5 flex-wrap"
         style={{ borderTop: '1px solid var(--cp-border)', fontSize: '11px', color: 'var(--cp-text-muted)' }}>
         <span style={{ opacity: 0.65 }}>{t('footer.guides')}</span>
-        <a href="/singing-practice" style={footerLink}>{t('footer.singingPractice')}</a>
-        <a href="/youtube-loop" style={footerLink}>{t('footer.youtubeLoop')}</a>
-        <a href="/slow-down" style={footerLink}>{t('footer.slowDown')}</a>
-        <a href="/lyrics-practice" style={footerLink}>{t('footer.lyricsPractice')}</a>
+        <a href="/singing-practice/" style={footerLink}>{t('footer.singingPractice')}</a>
+        <a href="/youtube-loop/" style={footerLink}>{t('footer.youtubeLoop')}</a>
+        <a href="/slow-down/" style={footerLink}>{t('footer.slowDown')}</a>
+        <a href="/lyrics-practice/" style={footerLink}>{t('footer.lyricsPractice')}</a>
       </footer>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}

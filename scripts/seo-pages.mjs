@@ -291,17 +291,17 @@ function renderFaqJsonLd(page) {
 }
 
 export function renderPageHtml(page) {
-  const url = `${SITE_ORIGIN}/${page.slug}`
+  const url = `${SITE_ORIGIN}/${page.slug}/`
   const others = PAGES.filter((p) => p.slug !== page.slug)
 
   const navLinks = PAGES.map((p) =>
     p.slug === page.slug
       ? `<span aria-current="page" style="color:var(--cp-text)">${esc(NAV_LABELS[p.slug])}</span>`
-      : `<a href="/${p.slug}">${esc(NAV_LABELS[p.slug])}</a>`,
+      : `<a href="/${p.slug}/">${esc(NAV_LABELS[p.slug])}</a>`,
   ).join('\n        ')
 
   const relatedLinks = others
-    .map((p) => `<a href="/${p.slug}">${esc(p.h1)}</a>`)
+    .map((p) => `<a href="/${p.slug}/">${esc(p.h1)}</a>`)
     .join('\n      ')
 
   return `<!doctype html>
@@ -373,7 +373,7 @@ export function renderSitemap(buildDate) {
   const entries = [
     { loc: `${SITE_ORIGIN}/`, changefreq: 'weekly', priority: '1.0' },
     ...PAGES.map((p) => ({
-      loc: `${SITE_ORIGIN}/${p.slug}`,
+      loc: `${SITE_ORIGIN}/${p.slug}/`,
       changefreq: 'monthly',
       priority: '0.8',
     })),

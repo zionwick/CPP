@@ -74,7 +74,7 @@ for (const page of PAGES) {
   const bodyText = extractMainText(written)
   const checks = [
     [`<title>${page.title}</title>`, '<title>'],
-    [`<link rel="canonical" href="https://cpplay.org/${page.slug}" />`, 'canonical'],
+    [`<link rel="canonical" href="https://cpplay.org/${page.slug}/" />`, 'canonical'],
     ['property="og:title"', 'og:title'],
     ['property="og:description"', 'og:description'],
     ['property="og:url"', 'og:url'],
@@ -117,7 +117,7 @@ const sitemapPath = path.join(distDir, 'sitemap.xml')
 fs.writeFileSync(sitemapPath, renderSitemap(buildDate))
 const sitemap = fs.readFileSync(sitemapPath, 'utf-8')
 for (const page of PAGES) {
-  if (!sitemap.includes(`https://cpplay.org/${page.slug}`)) {
+  if (!sitemap.includes(`<loc>https://cpplay.org/${page.slug}/</loc>`)) {
     problems.push(`sitemap.xml에 /${page.slug} 경로가 없습니다.`)
   }
 }
@@ -126,7 +126,7 @@ console.log(`[prerender] ${path.relative(root, sitemapPath)} 생성 — lastmod 
 // ── 4) 메인 페이지가 세 페이지를 링크하는지 확인 (내부 링크) ──
 const mainHtml = fs.readFileSync(indexPath, 'utf-8')
 for (const page of PAGES) {
-  if (!mainHtml.includes(`href="/${page.slug}"`)) {
+  if (!mainHtml.includes(`href="/${page.slug}/"`)) {
     problems.push(`메인 페이지(dist/index.html)에 /${page.slug} 링크가 없습니다.`)
   }
 }
