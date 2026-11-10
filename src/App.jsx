@@ -701,7 +701,7 @@ export default function App() {
     <div style={{ background: 'var(--cp-bg)' }} className="h-screen text-[var(--cp-text)] flex flex-col overflow-hidden">
 
       {/* SEO용 숨김 제목 — 시각적으로는 노출하지 않되 검색엔진/스크린리더에는 페이지 정체성을 전달 */}
-      <h1 className="sr-only">CopyPractice Player - 유튜브 구간 반복 연습, 속도 조절, 가사 동기화 보컬·악기 연습 앱</h1>
+      <h1 className="sr-only">CopyPractice Player - 무료 노래 연습 사이트: 유튜브 구간 반복, 속도 조절, 가사 보며 보컬·악기 연습</h1>
 
       {/* ── Header ── */}
       <header className="shrink-0 flex items-center px-4 py-3" style={{ borderBottom: '1px solid var(--cp-border)' }}>
@@ -1134,6 +1134,7 @@ export default function App() {
       <footer className="shrink-0 flex items-center justify-center gap-x-4 gap-y-1 px-4 py-1.5 flex-wrap"
         style={{ borderTop: '1px solid var(--cp-border)', fontSize: '11px', color: 'var(--cp-text-muted)' }}>
         <span style={{ opacity: 0.65 }}>{t('footer.guides')}</span>
+        <a href="/singing-practice" style={footerLink}>{t('footer.singingPractice')}</a>
         <a href="/youtube-loop" style={footerLink}>{t('footer.youtubeLoop')}</a>
         <a href="/slow-down" style={footerLink}>{t('footer.slowDown')}</a>
         <a href="/lyrics-practice" style={footerLink}>{t('footer.lyricsPractice')}</a>
