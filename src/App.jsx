@@ -80,6 +80,30 @@ function pickTickInterval(duration, maxTicks = 10) {
   return TICK_INTERVALS[TICK_INTERVALS.length - 1]
 }
 
+// 헤더 토글 손잡이 안 아이콘 (글자 기호는 기기·브라우저마다 안 그려지거나 색이 바뀌는 경우가 있어 SVG 사용)
+function KnobIcon({ name }) {
+  const common = { width: 12, height: 12, viewBox: '0 0 24 24', 'aria-hidden': true, focusable: 'false' }
+  if (name === 'moon') return (
+    <svg {...common}><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="currentColor" /></svg>
+  )
+  if (name === 'sun') return (
+    <svg {...common} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+      <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
+      <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" />
+    </svg>
+  )
+  if (name === 'desktop') return (
+    <svg {...common} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round">
+      <rect x="3" y="4.5" width="18" height="12" rx="1.5" /><path d="M9 20.5h6M12 16.5v4" />
+    </svg>
+  )
+  return (
+    <svg {...common} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round">
+      <rect x="6.5" y="2.5" width="11" height="19" rx="2.2" /><circle cx="12" cy="18" r="0.6" fill="currentColor" />
+    </svg>
+  )
+}
+
 function VDivider() {
   return <div className="w-px self-stretch shrink-0" style={{ background: 'var(--cp-border)' }} />
 }
@@ -736,8 +760,8 @@ export default function App() {
               width: '20px', height: '20px', borderRadius: '50%',
               background: 'var(--cp-text)', transition: 'left 0.2s',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '11px', lineHeight: 1, color: 'var(--cp-bg)',
-            }} aria-hidden="true">{theme === 'dark' ? '☾' : '☀'}</div>
+              color: 'var(--cp-bg)',
+            }} aria-hidden="true"><KnobIcon name={theme === 'dark' ? 'moon' : 'sun'} /></div>
           </button>
           <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.warm')}</span>
         </div>
@@ -766,8 +790,8 @@ export default function App() {
               width: '20px', height: '20px', borderRadius: '50%',
               background: 'var(--cp-text)', transition: 'left 0.2s',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '10px', lineHeight: 1, color: 'var(--cp-bg)', fontWeight: 700,
-            }} aria-hidden="true">{viewMode === 'desktop' ? 'PC' : 'M'}</div>
+              color: 'var(--cp-bg)',
+            }} aria-hidden="true"><KnobIcon name={viewMode === 'desktop' ? 'desktop' : 'mobile'} /></div>
           </button>
           <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.mobile')}</span>
           <VDivider />
