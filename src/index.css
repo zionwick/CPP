@@ -12,7 +12,7 @@
   --cp-accent-text: #000000;
   /* 사이트가 직접 다크 화면을 제공한다고 브라우저에 알림.
      (삼성 인터넷·크롬 등의 '강제 다크 모드'가 색을 임의로 바꿔 버튼 아이콘이 안 보이던 문제 방지) */
-  color-scheme: dark;
+  color-scheme: only dark;
 }
 
 :root[data-theme='warm'] {
@@ -26,7 +26,8 @@
   --cp-text-muted: #0a6fb0;
   --cp-accent: #ff3c28;
   --cp-accent-text: #ffffff;
-  color-scheme: light;
+  /* 'only light': 삼성 인터넷·크롬의 강제 다크 모드가 라이트 테마 배경을 어둡게 칠하지 못하게 함 */
+  color-scheme: only light;
 }
 
 * { box-sizing: border-box; }
