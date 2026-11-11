@@ -51,10 +51,11 @@
     "looping": "Looping"
   },
   "lyrics": {
+    "fontSize": "Font size",
     "highlight": "Highlight",
-    "clearHighlight": "Clear",
+    "clearHighlight": "Unmark",
     "save": "Save",
-    "clear": "Clear",
+    "clear": "Clear all",
     "savedLyrics": "Saved Lyrics",
     "noSavedLyrics": "No saved lyrics yet.",
     "title": "Title",

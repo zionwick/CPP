@@ -1030,14 +1030,16 @@ export default function App() {
         {/* ══ RIGHT — 가사 패널 ══ */}
         <div className={`min-w-0 flex flex-col ${viewMode === 'mobile' ? 'border-t' : 'flex-1 border-l'} border-[var(--cp-border)]`}>
           {/* 가사 툴바 */}
-          <div className="shrink-0 px-4 py-2.5 flex items-center gap-3 flex-wrap"
+          <div className={`shrink-0 flex items-center flex-wrap ${viewMode === 'mobile' ? 'px-3 py-1.5 gap-x-2 gap-y-1.5' : 'px-4 py-2.5 gap-3'}`}
             style={{ borderBottom: '1px solid var(--cp-border)', background: 'var(--cp-panel)' }}>
-            <span className="text-xs font-medium shrink-0" style={{ color: 'var(--cp-text-muted)' }}>LYRICS</span>
-            <VDivider />
-            <div className="flex items-center gap-1 shrink-0">
+            {viewMode !== 'mobile' && <>
+              <span className="text-xs font-medium shrink-0" style={{ color: 'var(--cp-text-muted)' }}>LYRICS</span>
+              <VDivider />
+            </>}
+            <div className="flex items-center gap-1 shrink-0" title={t('lyrics.fontSize')}>
               {FONT_SIZES.map(({ size, label }) => (
                 <button key={size} onClick={() => setFontSize(size)} style={{
-                  padding: '3px 8px', borderRadius: '5px', fontSize: '11px', fontWeight: 600,
+                  padding: viewMode === 'mobile' ? '3px 6px' : '3px 8px', borderRadius: '5px', fontSize: '11px', fontWeight: 600,
                   border: 'none', cursor: 'pointer',
                   background: fontSize === size ? 'var(--cp-border)' : 'transparent',
                   color: fontSize === size ? 'var(--cp-text)' : 'var(--cp-text-muted)',
@@ -1045,11 +1047,12 @@ export default function App() {
               ))}
             </div>
             <VDivider />
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('lyrics.highlight')}</span>
+            <div className="flex items-center gap-1.5 shrink-0" title={t('lyrics.highlight')}>
+              {viewMode !== 'mobile' && <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('lyrics.highlight')}</span>}
               {HIGHLIGHTS.map(({ color, bg }) => (
                 <button key={color}
                   onMouseDown={e => { e.preventDefault(); setActiveHighlight(color); applyHighlight(color) }}
+                  aria-label={`${t('lyrics.highlight')} ${color}`}
                   className={`w-5 h-5 rounded-full ${bg} hover:scale-110 transition-transform`}
                   style={activeHighlight === color ? { outline: '2px solid var(--cp-text)', outlineOffset: '2px' } : {}}
                 />
@@ -1060,7 +1063,7 @@ export default function App() {
                 background: 'transparent', color: 'var(--cp-text-muted)',
               }}>{t('lyrics.clearHighlight')}</button>
             </div>
-            <VDivider />
+            {viewMode !== 'mobile' && <VDivider />}
             <button onClick={() => { setShowSaveForm(p => !p); setSaveTitle('') }} style={{
               padding: '4px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,
               border: 'none', cursor: 'pointer',
@@ -1068,11 +1071,11 @@ export default function App() {
               color: showSaveForm ? 'var(--cp-accent)' : 'var(--cp-text-muted)',
               boxShadow: showSaveForm ? 'inset 0 0 0 1px var(--cp-accent)' : 'none',
             }}>💾 {t('lyrics.save')}</button>
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('panelType')}</span>
+            <div className={`flex items-center gap-2 ${viewMode === 'mobile' ? '' : 'ml-auto'}`} title={t('panelType')}>
+              {viewMode !== 'mobile' && <span className="text-xs" style={{ color: 'var(--cp-text-muted)' }}>{t('panelType')}</span>}
               {[{ key: 'A', label: 'A' }, { key: 'AB', label: 'A│B' }, { key: 'B', label: 'B' }].map(({ key, label }) => (
                 <button key={key} onClick={() => switchLyricsView(key)}
-                  className="min-h-[44px] md:min-h-[28px]"
+                  className={viewMode === 'mobile' ? 'min-h-[32px]' : 'min-h-[44px] md:min-h-[28px]'}
                   style={{
                     padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
                     border: 'none', cursor: 'pointer',

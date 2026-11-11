@@ -51,6 +51,7 @@
     "looping": "반복 중"
   },
   "lyrics": {
+    "fontSize": "글자 크기",
     "highlight": "형광",
     "clearHighlight": "제거",
     "save": "저장",
