@@ -51,6 +51,7 @@
     "looping": "Looping"
   },
   "lyrics": {
+    "vocalLessons": "Vocal lesson channels",
     "fontSize": "Font size",
     "highlight": "Highlight",
     "clearHighlight": "Unmark",

@@ -2,6 +2,8 @@
 // scripts/prerender.mjs가 이 모듈을 읽어 dist/<slug>/index.html과 dist/sitemap.xml을 만든다.
 // 이 페이지들은 JS 없이도 본문이 읽히는 순수 정적 HTML이다. (앱 번들을 로드하지 않음)
 
+import { VOCAL_CHANNELS } from './vocal-channels.mjs'
+
 export const SITE_ORIGIN = 'https://cpplay.org'
 
 // 메인 앱(/)과 각 소개 페이지에서 공통으로 쓰는 네비게이션 라벨
@@ -373,6 +375,7 @@ ${renderFaqJsonLd(page)}
 export function renderSitemap(buildDate) {
   const entries = [
     { loc: `${SITE_ORIGIN}/`, changefreq: 'weekly', priority: '1.0' },
+    { loc: `${SITE_ORIGIN}/vocal-lessons/`, changefreq: 'monthly', priority: '0.6' },
     ...PAGES.map((p) => ({
       loc: `${SITE_ORIGIN}/${p.slug}/`,
       changefreq: 'monthly',
@@ -520,5 +523,66 @@ export function renderPrivacyHtml() {
 
 // 모든 정적 페이지 하단에 들어가는 개인정보처리방침·문의 링크
 export function renderFooterExtra() {
-  return `<nav aria-label="사이트 정보"><a href="/privacy/">개인정보처리방침</a><a href="mailto:${CONTACT_EMAIL}">문의 ${CONTACT_EMAIL}</a></nav>`
+  return `<nav aria-label="사이트 정보"><a href="/vocal-lessons/">보컬 강의 추천채널</a><a href="/privacy/">개인정보처리방침</a><a href="mailto:${CONTACT_EMAIL}">문의 ${CONTACT_EMAIL}</a></nav>`
+}
+
+// ── 보컬 강의 추천 (/vocal-lessons/) ──
+export function renderVocalLessonsHtml() {
+  const url = `${SITE_ORIGIN}/vocal-lessons/`
+  const channels = [...VOCAL_CHANNELS].sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0))
+  const cards = channels.map((c) => `
+      <article class="ch${c.mine ? ' mine' : ''}">
+        ${c.mine ? '<span class="badge">CPP 운영자 채널</span>' : ''}
+        <h2>${esc(c.name)}</h2>
+        ${c.tags && c.tags.length ? `<p class="tags">${c.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}
+        <p>${esc(c.desc)}</p>
+        <a class="go" href="${esc(c.url)}" target="_blank" rel="noopener">유튜브 채널 보러가기 ↗</a>
+      </article>`).join('\n')
+  const desc = '노래 연습할 때 함께 보면 좋은 보컬 강의 유튜브 채널을 모았습니다. 발성, 고음, 호흡 강의를 보고 CopyPractice Player로 구간 반복하며 따라 연습해 보세요.'
+  return `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>보컬 강의 추천채널 – 노래 연습에 좋은 유튜브 | CopyPractice Player</title>
+    <meta name="description" content="${esc(desc)}" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="${url}" />
+    <meta name="theme-color" content="#0f0f13" />
+    <meta property="og:title" content="보컬 강의 추천채널 | CopyPractice Player" />
+    <meta property="og:description" content="${esc(desc)}" />
+    <meta property="og:url" content="${url}" />
+    <meta property="og:image" content="${SITE_ORIGIN}/og-image.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <style>${PAGE_CSS}
+.ch{background:var(--cp-panel);border:1px solid var(--cp-border);border-radius:12px;padding:20px 22px;margin:18px 0;position:relative}
+.ch.mine{border-color:var(--cp-accent)}
+.ch h2{border:0;margin:0 0 8px;padding:0;font-size:1.15rem}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;color:var(--cp-accent-text);background:var(--cp-accent);border-radius:999px;padding:2px 10px;margin-bottom:8px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.tags span{font-size:.78rem;color:var(--cp-text-muted);border:1px solid var(--cp-border);border-radius:999px;padding:1px 9px}
+.go{display:inline-block;margin-top:4px;background:#ff0033;color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:9px 16px;border-radius:8px}
+.tip{color:#cfcbe0}</style>
+  </head>
+  <body>
+    <div class="bar">
+      <a class="brand" href="/">CPP</a>
+      <a class="cta" href="/">연습하러 가기</a>
+    </div>
+    <main>
+      <h1>보컬 강의 추천채널</h1>
+      <p class="lead">${esc(desc)}</p>
+      ${cards}
+      <h2>강의 영상으로 연습하는 법</h2>
+      <p class="tip">강의 영상 주소를 CopyPractice Player에 붙여넣으면, 시범 부분만 A-B 구간 반복으로 돌려 듣고 0.75배속으로 늦춰 따라 할 수 있습니다. 설명을 듣다가 놓친 부분을 다시 찾느라 영상을 앞뒤로 넘길 필요가 없습니다.</p>
+      <a class="hero-cta" href="/">지금 바로 연습하기</a>
+    </main>
+    <footer>
+      ${renderFooterExtra()}
+      <p><a href="/">CopyPractice Player로 돌아가기</a></p>
+    </footer>
+  </body>
+</html>
+`
 }

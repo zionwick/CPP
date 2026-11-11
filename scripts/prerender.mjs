@@ -12,7 +12,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { PAGES, renderPageHtml, renderSitemap, renderPrivacyHtml, CONTACT_EMAIL } from './seo-pages.mjs'
+import { VOCAL_CHANNELS } from './vocal-channels.mjs'
+import { PAGES, renderPageHtml, renderSitemap, renderPrivacyHtml, renderVocalLessonsHtml, CONTACT_EMAIL } from './seo-pages.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = path.join(root, 'dist')
@@ -122,6 +123,19 @@ for (const page of PAGES) {
   console.log('[prerender] dist/privacy/index.html 생성')
 }
 
+// ── 2-2) 보컬 강의 추천 ──
+{
+  const outDir = path.join(distDir, 'vocal-lessons')
+  fs.mkdirSync(outDir, { recursive: true })
+  fs.writeFileSync(path.join(outDir, 'index.html'), renderVocalLessonsHtml())
+  if (VOCAL_CHANNELS.length === 0) problems.push('/vocal-lessons: 채널 목록(scripts/vocal-channels.mjs)이 비어 있습니다.')
+  for (const c of VOCAL_CHANNELS) {
+    if (!/^https:\/\/(www\.)?youtube\.com\//.test(c.url)) problems.push(`/vocal-lessons: 유튜브 주소가 아닙니다: ${c.url}`)
+    if (!c.name || !c.desc) problems.push(`/vocal-lessons: 이름·소개가 비었습니다: ${c.url}`)
+  }
+  console.log(`[prerender] dist/vocal-lessons/index.html 생성 — 채널 ${VOCAL_CHANNELS.length}개`)
+}
+
 // ── 3) sitemap.xml (lastmod = 빌드 날짜) ──
 const buildDate = new Date().toISOString().slice(0, 10)
 const sitemapPath = path.join(distDir, 'sitemap.xml')
@@ -142,7 +156,7 @@ for (const page of PAGES) {
   }
 }
 
-for (const needle of ['href="/privacy/"', `mailto:${CONTACT_EMAIL}`]) {
+for (const needle of ['href="/vocal-lessons/"', 'href="/privacy/"', `mailto:${CONTACT_EMAIL}`]) {
   if (!mainHtml.includes(needle)) problems.push(`메인 페이지에 ${needle} 링크가 없습니다.`)
 }
 

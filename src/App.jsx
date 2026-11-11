@@ -1089,6 +1089,12 @@ export default function App() {
                 fontSize: '11px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cp-text-muted)',
               }}>{t('lyrics.clear')}</button>
             </div>
+            <a href="/vocal-lessons/" className={viewMode === 'mobile' ? 'ml-auto' : ''} style={{
+              padding: '5px 12px', borderRadius: '999px', fontSize: '11px', fontWeight: 700,
+              textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
+              background: 'color-mix(in srgb, var(--cp-accent) 14%, transparent)',
+              color: 'var(--cp-accent)', boxShadow: 'inset 0 0 0 1px var(--cp-accent)',
+            }}>🎤 {t('lyrics.vocalLessons')}</a>
           </div>
 
           {/* 저장 폼 */}
@@ -1190,6 +1196,7 @@ export default function App() {
         <a href="/slow-down/" style={footerLink}>{t('footer.slowDown')}</a>
         <a href="/lyrics-practice/" style={footerLink}>{t('footer.lyricsPractice')}</a>
         <span aria-hidden="true" style={{ opacity: 0.4 }}>|</span>
+        <a href="/vocal-lessons/" style={footerLink}>{t('lyrics.vocalLessons')}</a>
         <a href="/privacy/" style={footerLink}>{t('footer.privacy')}</a>
         <a href="mailto:zocl888@gmail.com" style={footerLink}>{t('footer.contact')}</a>
       </footer>
