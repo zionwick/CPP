@@ -131,7 +131,7 @@ for (const page of PAGES) {
   if (VOCAL_CHANNELS.length === 0) problems.push('/vocal-lessons: 채널 목록(scripts/vocal-channels.mjs)이 비어 있습니다.')
   for (const c of VOCAL_CHANNELS) {
     if (!/^https:\/\/(www\.)?youtube\.com\//.test(c.url)) problems.push(`/vocal-lessons: 유튜브 주소가 아닙니다: ${c.url}`)
-    if (!c.name || !c.desc) problems.push(`/vocal-lessons: 이름·소개가 비었습니다: ${c.url}`)
+    if (!c.name) problems.push(`/vocal-lessons: 채널 이름이 비었습니다: ${c.url}`)
   }
   console.log(`[prerender] dist/vocal-lessons/index.html 생성 — 채널 ${VOCAL_CHANNELS.length}개`)
 }

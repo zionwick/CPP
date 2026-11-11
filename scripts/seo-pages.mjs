@@ -535,7 +535,7 @@ export function renderVocalLessonsHtml() {
         ${c.mine ? '<span class="badge">CPP 운영자 채널</span>' : ''}
         <h2>${esc(c.name)}</h2>
         ${c.tags && c.tags.length ? `<p class="tags">${c.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}
-        <p>${esc(c.desc)}</p>
+        ${c.desc ? `<p>${esc(c.desc)}</p>` : ''}
         <a class="go" href="${esc(c.url)}" target="_blank" rel="noopener">유튜브 채널 보러가기 ↗</a>
       </article>`).join('\n')
   const desc = '노래 연습할 때 함께 보면 좋은 보컬 강의 유튜브 채널을 모았습니다. 발성, 고음, 호흡 강의를 보고 CopyPractice Player로 구간 반복하며 따라 연습해 보세요.'
