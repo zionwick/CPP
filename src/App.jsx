@@ -721,10 +721,11 @@ export default function App() {
       <h1 className="sr-only">CopyPractice Player - 무료 노래 연습 사이트: 유튜브 구간 반복, 속도 조절, 가사 보며 보컬·악기 연습</h1>
 
       {/* ── Header ── */}
-      <header className="shrink-0 flex items-center px-4 py-3" style={{ borderBottom: '1px solid var(--cp-border)' }}>
-        <div className="flex-1 flex items-center gap-3">
-          <span style={{ fontSize: '11px', color: theme === 'dark' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.dark')}</span>
-          <button onClick={() => setTheme(prev => prev === 'dark' ? 'warm' : 'dark')} title={t('theme.switchTheme')} style={{
+      <header className="shrink-0 flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3" style={{ borderBottom: '1px solid var(--cp-border)' }}>
+        <div className="sm:flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
+          <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: theme === 'dark' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.dark')}</span>
+          <button onClick={() => setTheme(prev => prev === 'dark' ? 'warm' : 'dark')} title={t('theme.switchTheme')}
+            aria-label={`${t('theme.switchTheme')} (${theme === 'dark' ? t('theme.dark') : t('theme.warm')})`} style={{
             width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             background: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-border)',
             position: 'relative', transition: 'background 0.2s', flexShrink: 0,
@@ -734,23 +735,27 @@ export default function App() {
               left: theme === 'warm' ? '22px' : '2px',
               width: '20px', height: '20px', borderRadius: '50%',
               background: 'var(--cp-text)', transition: 'left 0.2s',
-            }} />
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '11px', lineHeight: 1, color: 'var(--cp-bg)',
+            }} aria-hidden="true">{theme === 'dark' ? '☾' : '☀'}</div>
           </button>
-          <span style={{ fontSize: '11px', color: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.warm')}</span>
+          <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: theme === 'warm' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('theme.warm')}</span>
         </div>
-        <div className="flex flex-col items-center gap-0.5">
-          <span style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '0.3em', color: 'var(--cp-accent)', lineHeight: 1 }}>CPP</span>
-          <span style={{ fontSize: '0.6rem', letterSpacing: '0.25em', color: 'var(--cp-text-muted)', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
+        <div className="shrink-0 flex flex-col items-center gap-0.5">
+          <span className="text-2xl sm:text-[2rem]" style={{ fontWeight: 700, letterSpacing: '0.3em', marginRight: '-0.3em', color: 'var(--cp-accent)', lineHeight: 1 }}>CPP</span>
+          <span className="hidden sm:block" style={{ fontSize: '0.6rem', letterSpacing: '0.25em', whiteSpace: 'nowrap', color: 'var(--cp-text-muted)', fontWeight: 400 }}>COPYPRACTICE PLAYER</span>
         </div>
-        <div className="flex-1 flex justify-end items-center gap-3">
+        <div className="sm:flex-1 min-w-0 flex justify-end items-center gap-2 sm:gap-3">
           <button onClick={() => setShowHelp(true)} title={t('header.help')} style={{
             width: '28px', height: '28px', borderRadius: '50%',
             border: '1px solid var(--cp-border)', background: 'var(--cp-panel-alt)',
             color: 'var(--cp-text-muted)', fontSize: '13px', fontWeight: 700,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>?</button>
-          <span style={{ fontSize: '11px', color: viewMode === 'desktop' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.pc')}</span>
-          <button onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')} style={{
+          <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: viewMode === 'desktop' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.pc')}</span>
+          <button onClick={() => setViewMode(m => m === 'desktop' ? 'mobile' : 'desktop')}
+            title={`${t('viewMode.pc')} / ${t('viewMode.mobile')}`}
+            aria-label={`${t('viewMode.pc')} / ${t('viewMode.mobile')} (${viewMode === 'desktop' ? t('viewMode.pc') : t('viewMode.mobile')})`} style={{
             width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
             background: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-border)',
             position: 'relative', transition: 'background 0.2s', flexShrink: 0,
@@ -760,14 +765,16 @@ export default function App() {
               left: viewMode === 'mobile' ? '22px' : '2px',
               width: '20px', height: '20px', borderRadius: '50%',
               background: 'var(--cp-text)', transition: 'left 0.2s',
-            }} />
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '10px', lineHeight: 1, color: 'var(--cp-bg)', fontWeight: 700,
+            }} aria-hidden="true">{viewMode === 'desktop' ? 'PC' : 'M'}</div>
           </button>
-          <span style={{ fontSize: '11px', color: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.mobile')}</span>
+          <span className="hidden sm:inline" style={{ fontSize: '11px', whiteSpace: 'nowrap', color: viewMode === 'mobile' ? 'var(--cp-accent)' : 'var(--cp-text-muted)' }}>{t('viewMode.mobile')}</span>
           <VDivider />
           <button onClick={toggleLanguage} title={language === 'ko' ? 'Switch to English' : '한국어로 전환'} style={{
             padding: '3px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 700,
             border: '1px solid var(--cp-border)', background: 'var(--cp-panel-alt)',
-            color: 'var(--cp-accent)', cursor: 'pointer', letterSpacing: '0.05em',
+            color: 'var(--cp-accent)', cursor: 'pointer', letterSpacing: '0.05em', flexShrink: 0, whiteSpace: 'nowrap',
           }}>{language === 'ko' ? 'KO' : 'EN'}</button>
         </div>
       </header>
