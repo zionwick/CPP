@@ -7,4 +7,5 @@
 //   mine: 운영자 본인 채널이면 true (맨 위에 강조 표시)
 export const VOCAL_CHANNELS = [
   { name: '별소리남', url: 'https://www.youtube.com/@byeolsorinam' },
+  { name: '정진우보컬랩', url: 'https://www.youtube.com/@vocallab_jeongjinwoo' },
 ]
