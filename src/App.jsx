@@ -50,7 +50,6 @@ function readStorage(key) {
 
 // 빌드 타임 프리렌더(SSR)는 window/localStorage가 없는 Node 환경에서 실행되므로,
 // 초기 렌더에서 이를 직접 참조하는 곳은 안전한 기본값으로 분기해야 한다.
-const isBrowser = typeof window !== 'undefined'
 
 // ── 오디오 파일 판별 & react-player <audio> 강제 렌더링 ──
 const AUDIO_EXT_RE = /\.(mp3|aac|flac|wav|ogg|m4a)$/i
@@ -348,8 +347,8 @@ export default function App() {
   const [videoCollapsed, setVideoCollapsed] = useState(false)
 
   // ── 영상 기록 ──
-  const [history, setHistory]             = useState(() => readStorage(HISTORY_KEY))
-  const [showHistory, setShowHistory]     = useState(() => !isBrowser || window.innerWidth >= 768)
+  const [history, setHistory]             = useState([])
+  const [showHistory, setShowHistory]     = useState(true)
   const [activeVideoId, setActiveVideoId] = useState(null)
   const [editVideoId, setEditVideoId]     = useState(null)
   const [editVideoTitle, setEditVideoTitle] = useState('')
@@ -357,7 +356,7 @@ export default function App() {
   // ── 가사 상태 ──
   const [fontSize, setFontSize]               = useState(30)
   const [activeHighlight, setActiveHighlight] = useState(HIGHLIGHTS[0].color)
-  const [lyricsLib, setLyricsLib]           = useState(() => readStorage(LYRICS_KEY))
+  const [lyricsLib, setLyricsLib]           = useState([])
   const [showLyricsLib, setShowLyricsLib]   = useState(true)
   const [showSaveForm, setShowSaveForm]     = useState(false)
   const [saveTitle, setSaveTitle]           = useState('')
@@ -365,12 +364,30 @@ export default function App() {
   const [editLyricsId, setEditLyricsId]     = useState(null)
   const [editLyricsTitle, setEditLyricsTitle] = useState('')
   const [activePanel, setActivePanel]       = useState(1)
-  const [viewMode, setViewMode]             = useState(() => (isBrowser && window.innerWidth < 768) ? 'mobile' : 'desktop')
-  const [lyricsView, setLyricsView]         = useState(() => (isBrowser && window.innerWidth < 768) ? 'A' : 'AB')
-  const [showHelp, setShowHelp]             = useState(() => isBrowser ? !localStorage.getItem('cp-help-seen') : true)
+  const [viewMode, setViewMode]             = useState('desktop')
+  const [lyricsView, setLyricsView]         = useState('AB')
+  const [showHelp, setShowHelp]             = useState(true)
+
+  const [theme, setTheme] = useState('dark')
+
+  // ── 브라우저 전용 초기값 적용 ──
+  // 빌드 타임 프리렌더(SSR) 결과와 첫 렌더가 같아야 hydration 오류(React #418)가 나지 않는다.
+  // 그래서 위 상태들은 서버와 같은 기본값으로 시작하고, 마운트 직후 한 번만
+  // 화면 너비·localStorage 값을 반영한다. (테마 저장 effect보다 먼저 선언되어야 저장된 테마를 덮어쓰지 않음)
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768
+    /* eslint-disable react-hooks/set-state-in-effect -- hydration 이후 브라우저 값 반영(2-pass 렌더) */
+    setHistory(readStorage(HISTORY_KEY))
+    setLyricsLib(readStorage(LYRICS_KEY))
+    setShowHistory(!isMobile)
+    setViewMode(isMobile ? 'mobile' : 'desktop')
+    setLyricsView(isMobile ? 'A' : 'AB')
+    setShowHelp(!localStorage.getItem('cp-help-seen'))
+    setTheme(localStorage.getItem(THEME_KEY) || 'dark')
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [])
 
   // ── 테마 (다크 / 웜) ──
-  const [theme, setTheme] = useState(() => isBrowser ? (localStorage.getItem(THEME_KEY) || 'dark') : 'dark')
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem(THEME_KEY, theme)
