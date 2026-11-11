@@ -562,8 +562,7 @@ export function renderVocalLessonsHtml() {
 .badge{display:inline-block;font-size:.75rem;font-weight:700;color:var(--cp-accent-text);background:var(--cp-accent);border-radius:999px;padding:2px 10px;margin-bottom:8px}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
 .tags span{font-size:.78rem;color:var(--cp-text-muted);border:1px solid var(--cp-border);border-radius:999px;padding:1px 9px}
-.go{display:inline-block;margin-top:4px;background:#ff0033;color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:9px 16px;border-radius:8px}
-.tip{color:#cfcbe0}</style>
+.go{display:inline-block;margin-top:4px;background:#ff0033;color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:9px 16px;border-radius:8px}</style>
   </head>
   <body>
     <div class="bar">
@@ -574,8 +573,6 @@ export function renderVocalLessonsHtml() {
       <h1>보컬 강의 추천채널</h1>
       <p class="lead">${esc(desc)}</p>
       ${cards}
-      <h2>강의 영상으로 연습하는 법</h2>
-      <p class="tip">강의 영상 주소를 CopyPractice Player에 붙여넣으면, 시범 부분만 A-B 구간 반복으로 돌려 듣고 0.75배속으로 늦춰 따라 할 수 있습니다. 설명을 듣다가 놓친 부분을 다시 찾느라 영상을 앞뒤로 넘길 필요가 없습니다.</p>
       <a class="hero-cta" href="/">지금 바로 연습하기</a>
     </main>
     <footer>
