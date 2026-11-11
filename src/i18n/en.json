@@ -2,7 +2,7 @@
   "panelType": "PANEL TYPE",
   "theme": {
     "dark": "Dark",
-    "warm": "Warm",
+    "warm": "Light",
     "switchTheme": "Switch Theme"
   },
   "viewMode": {

@@ -16,14 +16,15 @@
 }
 
 :root[data-theme='warm'] {
-  /* 테마 B: 웜 (아날로그 스튜디오/카세트덱 컨셉) */
-  --cp-bg: #f3ede1;
-  --cp-panel: #ece3d2;
-  --cp-panel-alt: #e2d5bc;
-  --cp-border: #d3c3a0;
-  --cp-text: #33291f;
-  --cp-text-muted: #8a6a3f;
-  --cp-accent: #d3691e;
+  /* 테마 B: 라이트 (네온 레드 & 블루 — 게임기 컨트롤러 색감)
+     내부 값은 기존 사용자 설정 호환을 위해 'warm' 그대로 유지 */
+  --cp-bg: #f6f7f9;
+  --cp-panel: #eef0f4;
+  --cp-panel-alt: #e3e6ec;
+  --cp-border: #d0d5de;
+  --cp-text: #1c1f26;
+  --cp-text-muted: #0a6fb0;
+  --cp-accent: #ff3c28;
   --cp-accent-text: #ffffff;
   color-scheme: light;
 }

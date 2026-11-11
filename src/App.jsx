@@ -411,7 +411,7 @@ export default function App() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
 
-  // ── 테마 (다크 / 웜) ──
+  // ── 테마 (다크 / 라이트, 내부 값은 'warm') ──
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem(THEME_KEY, theme)

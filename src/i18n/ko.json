@@ -2,7 +2,7 @@
   "panelType": "패널 타입",
   "theme": {
     "dark": "다크",
-    "warm": "웜",
+    "warm": "라이트",
     "switchTheme": "테마 전환"
   },
   "viewMode": {
