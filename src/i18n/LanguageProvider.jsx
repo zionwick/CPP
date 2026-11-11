@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import { LanguageContext } from './languageContext.js'
 import ko from './ko.json'
 import en from './en.json'
+import { getLanguageSnapshot, getServerLanguageSnapshot, subscribeLanguage, chooseLanguage } from './languageStore.js'
 
-const LANGUAGE_KEY = 'cp-language'
 const RESOURCES = { ko, en }
 
 function resolve(obj, path) {
@@ -16,19 +16,20 @@ function interpolate(str, params) {
 }
 
 export function LanguageProvider({ children }) {
-  // 빌드 타임 프리렌더(SSR)는 localStorage가 없는 Node 환경에서 실행되므로 기본값(ko)으로 분기
-  const [language, setLanguage] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem(LANGUAGE_KEY) : null) || 'ko')
+  const language = useSyncExternalStore(subscribeLanguage, getLanguageSnapshot, getServerLanguageSnapshot)
 
   useEffect(() => {
-    localStorage.setItem(LANGUAGE_KEY, language)
+    document.documentElement.lang = language
   }, [language])
+
+  const setLanguage = (next) => chooseLanguage(typeof next === 'function' ? next(language) : next)
 
   const t = (key, params) => {
     const value = resolve(RESOURCES[language], key) ?? resolve(RESOURCES.ko, key) ?? key
     return interpolate(value, params)
   }
 
-  const toggleLanguage = () => setLanguage(l => (l === 'ko' ? 'en' : 'ko'))
+  const toggleLanguage = () => setLanguage(language === 'ko' ? 'en' : 'ko')
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t }}>
